@@ -205,10 +205,10 @@ export function AdminOverviewClient() {
                 <>
                   <TableHeader className="bg-background [&_th]:font-semibold">
                     <TableRow className="text-foreground hover:bg-transparent">
-                      <TableHead className="sm:hidden">Name / Email</TableHead>
-                      <TableHead className="hidden sm:table-cell">Name</TableHead>
-                      <TableHead className="hidden sm:table-cell">Email</TableHead>
-                      <TableHead className="hidden sm:table-cell">Auth</TableHead>
+                      <TableHead className="admin-users-combined-col sm:hidden">Name / Email</TableHead>
+                      <TableHead className="admin-users-split-col hidden sm:table-cell">Name</TableHead>
+                      <TableHead className="admin-users-split-col hidden sm:table-cell">Email</TableHead>
+                      <TableHead className="admin-users-split-col hidden sm:table-cell">Auth</TableHead>
                       <TableHead className="text-center">Leagues</TableHead>
                       <TableHead className="hidden text-right md:table-cell">Created</TableHead>
                       <TableHead className="hidden text-right md:table-cell">Last Sign-in</TableHead>
@@ -217,17 +217,17 @@ export function AdminOverviewClient() {
                   <TableBody>
                     {data?.usersTable?.map((row) => (
                       <TableRow key={row.id}>
-                        <TableCell className="sm:hidden">
+                        <TableCell className="admin-users-combined-col sm:hidden">
                           <div>{row.name ?? "—"}</div>
                           <div className="text-xs text-muted-foreground">
                             {row.email ?? "—"}
                           </div>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell">{row.name ?? "—"}</TableCell>
-                        <TableCell className="hidden text-xs sm:table-cell sm:text-sm">
+                        <TableCell className="admin-users-split-col hidden sm:table-cell">{row.name ?? "—"}</TableCell>
+                        <TableCell className="admin-users-split-col hidden text-xs sm:table-cell sm:text-sm">
                           {row.email ?? "—"}
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell">{row.authMethod ?? "—"}</TableCell>
+                        <TableCell className="admin-users-split-col hidden sm:table-cell">{row.authMethod ?? "—"}</TableCell>
                         <TableCell className="text-center font-mono">
                           {row.linkedLeagues > 0 ? (
                             <ResponsiveInfoCard

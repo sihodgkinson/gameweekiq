@@ -126,11 +126,13 @@
 }
 
 @media (orientation: landscape) and (max-width: 932px) and (hover: none) {
-  .stats-cards-landscape-grid {
+  .stats-cards-landscape-grid,
+  .dashboard-widget-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   }
 
-  .stats-cards-landscape-grid > * {
+  .stats-cards-landscape-grid > *,
+  .dashboard-widget-grid > * {
     min-width: 0;
   }
 
@@ -159,14 +161,24 @@
     max-height: none !important;
     overflow-y: visible !important;
   }
+
+  .admin-users-combined-col {
+    display: table-cell !important;
+  }
+
+  .admin-users-split-col {
+    display: none !important;
+  }
 }
 
 @media (orientation: portrait) and (max-width: 639px) and (hover: none) {
-  .stats-cards-landscape-grid {
+  .stats-cards-landscape-grid,
+  .dashboard-widget-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
-  .stats-cards-landscape-grid > * {
+  .stats-cards-landscape-grid > *,
+  .dashboard-widget-grid > * {
     min-width: 0;
   }
 
