@@ -157,7 +157,7 @@ export function AppSidebar({
             aria-label="Close sidebar"
           />
           <aside className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-[86vw] max-w-[320px] flex-col gap-4 border-r border-border bg-background px-4 pb-4 shadow-2xl",
+            "fixed inset-y-0 left-0 z-50 flex w-screen max-w-[420px] flex-col gap-4 border-r border-border bg-background px-4 pb-4 shadow-2xl",
             !useDrawerNav && "sm:hidden"
           )}>
             <div className="mx-[-16px] flex h-16 items-center justify-between border-b border-border px-4">
@@ -171,7 +171,7 @@ export function AppSidebar({
               <button
                 type="button"
                 onClick={() => onMobileSidebarOpenChange(false)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border"
                 aria-label="Close sidebar"
               >
                 <X className="h-4 w-4" />
@@ -186,11 +186,11 @@ export function AppSidebar({
                   </p>
                 </div>
 
-                <nav className="flex flex-col gap-0">
+                <nav className="flex flex-col gap-1">
                   {section.items.map((item) => {
                     const Icon = item.icon;
                     const itemClasses = cn(
-                      "inline-flex h-8 items-center rounded-md px-2.5 text-sm transition-colors duration-150",
+                      "inline-flex h-12 items-center rounded-md px-4 text-base transition-colors duration-150",
                       item.active
                         ? "bg-muted/70 text-foreground"
                         : item.placeholder
@@ -202,7 +202,7 @@ export function AppSidebar({
                     if (item.placeholder) {
                       return (
                         <div key={item.key} className={itemClasses} aria-disabled="true">
-                          <Icon className="mr-2 h-4 w-4 shrink-0" />
+                          <Icon className="mr-2 h-5 w-5 shrink-0" />
                           {item.label}
                         </div>
                       );
@@ -214,7 +214,7 @@ export function AppSidebar({
                         href={item.href}
                         className={itemClasses}
                       >
-                        <Icon className="mr-2 h-4 w-4 shrink-0" />
+                        <Icon className="mr-2 h-5 w-5 shrink-0" />
                         {item.label}
                       </Link>
                     );
@@ -223,27 +223,27 @@ export function AppSidebar({
               </div>
             ))}
 
-            <div className="mt-auto space-y-0" data-sidebar-interactive="true">
+            <div className="mt-auto space-y-1" data-sidebar-interactive="true">
               <button
                 type="button"
                 disabled
-                className="inline-flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-sm text-foreground opacity-50 disabled:pointer-events-none"
+                className="inline-flex h-12 w-full items-center gap-2 rounded-md px-4 text-base text-foreground opacity-50 disabled:pointer-events-none"
                 aria-label="Settings"
               >
-                <Settings className="h-4 w-4" />
+                <Settings className="h-5 w-5" />
                 <span>Settings</span>
               </button>
               {footerItem ? (
                 <Link
                   href={footerItem.href}
                   className={cn(
-                    "inline-flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-sm transition-colors duration-150",
+                    "inline-flex h-12 w-full items-center gap-2 rounded-md px-4 text-base transition-colors duration-150",
                     footerItem.active
                       ? "bg-muted/70 text-foreground"
                       : "text-foreground hover:bg-muted/70 hover:text-foreground"
                   )}
                 >
-                  <footerItem.icon className="h-4 w-4 shrink-0" />
+                  <footerItem.icon className="h-5 w-5 shrink-0" />
                   <span>{footerItem.label}</span>
                 </Link>
               ) : null}
