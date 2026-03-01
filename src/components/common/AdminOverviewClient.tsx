@@ -205,9 +205,10 @@ export function AdminOverviewClient() {
                 <>
                   <TableHeader className="bg-background [&_th]:font-semibold">
                     <TableRow className="text-foreground hover:bg-transparent">
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Auth</TableHead>
+                      <TableHead className="sm:hidden">Name / Email</TableHead>
+                      <TableHead className="hidden sm:table-cell">Name</TableHead>
+                      <TableHead className="hidden sm:table-cell">Email</TableHead>
+                      <TableHead className="hidden sm:table-cell">Auth</TableHead>
                       <TableHead className="text-center">Leagues</TableHead>
                       <TableHead className="hidden text-right md:table-cell">Created</TableHead>
                       <TableHead className="hidden text-right md:table-cell">Last Sign-in</TableHead>
@@ -216,11 +217,17 @@ export function AdminOverviewClient() {
                   <TableBody>
                     {data?.usersTable?.map((row) => (
                       <TableRow key={row.id}>
-                        <TableCell>{row.name ?? "—"}</TableCell>
-                        <TableCell className="text-xs sm:text-sm">
+                        <TableCell className="sm:hidden">
+                          <div>{row.name ?? "—"}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {row.email ?? "—"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">{row.name ?? "—"}</TableCell>
+                        <TableCell className="hidden text-xs sm:table-cell sm:text-sm">
                           {row.email ?? "—"}
                         </TableCell>
-                        <TableCell>{row.authMethod ?? "—"}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{row.authMethod ?? "—"}</TableCell>
                         <TableCell className="text-center font-mono">
                           {row.linkedLeagues > 0 ? (
                             <ResponsiveInfoCard
@@ -269,7 +276,7 @@ export function AdminOverviewClient() {
                       <TableHead>Name</TableHead>
                       <TableHead className="text-right">League Id</TableHead>
                       <TableHead className="text-center">Users</TableHead>
-                      <TableHead className="text-right">Created</TableHead>
+                      <TableHead className="hidden text-right sm:table-cell">Created</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -305,7 +312,7 @@ export function AdminOverviewClient() {
                             <span>{formatCount(row.linkedUsers)}</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right font-mono">
+                        <TableCell className="hidden text-right font-mono sm:table-cell">
                           {formatDate(row.createdAt)}
                         </TableCell>
                       </TableRow>
@@ -319,7 +326,7 @@ export function AdminOverviewClient() {
                   <TableHeader className="bg-background [&_th]:font-semibold">
                     <TableRow className="text-foreground hover:bg-transparent">
                       <TableHead className="w-[45%]">Table</TableHead>
-                      <TableHead>Schema</TableHead>
+                      <TableHead className="hidden sm:table-cell">Schema</TableHead>
                       <TableHead className="text-right">Rows</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -327,7 +334,7 @@ export function AdminOverviewClient() {
                     {data?.rowsBySource?.map((row) => (
                       <TableRow key={row.tableName}>
                         <TableCell className="text-xs sm:text-sm">{row.tableName}</TableCell>
-                        <TableCell>{row.source}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{row.source}</TableCell>
                         <TableCell className="text-right font-mono">{formatCount(row.rows)}</TableCell>
                       </TableRow>
                     ))}
