@@ -5,12 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-interface DashboardStatCardProps {
+interface DashboardStatCardProps extends Omit<React.ComponentProps<typeof Card>, "children"> {
   label: string;
-  value: React.ReactNode;
+  value?: React.ReactNode;
   loading?: boolean;
-  className?: string;
   valueClassName?: string;
+  headerRight?: React.ReactNode;
+  loadingFallback?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function DashboardStatCard({
@@ -19,16 +21,23 @@ export function DashboardStatCard({
   loading = false,
   className,
   valueClassName,
+  headerRight,
+  loadingFallback,
+  children,
+  ...cardProps
 }: DashboardStatCardProps) {
   return (
-    <Card className={cn("gap-3 p-4", className)}>
+    <Card className={cn("gap-3 p-4", className)} {...cardProps}>
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{label}</p>
+        {headerRight}
       </div>
       {loading ? (
-        <Skeleton className="h-10 w-28" />
+        loadingFallback ?? <Skeleton className="h-10 w-28" />
       ) : (
-        <p className={cn("text-4xl font-mono font-semibold leading-none", valueClassName)}>{value}</p>
+        children ?? (
+          <p className={cn("text-4xl font-mono font-semibold leading-none", valueClassName)}>{value}</p>
+        )
       )}
     </Card>
   );

@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import useSWR from "swr";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardStatCard } from "@/components/common/DashboardStatCard";
 import { EnrichedStanding } from "@/types/fpl";
 import { cn } from "@/lib/utils";
 import {
@@ -318,45 +318,42 @@ function StatCard({
   if (value === null) {
     // ✅ Skeleton while loading
     return (
-      <Card className="h-[184px] gap-4 p-4">
-        <Skeleton className="mb-2 h-4 w-24" />
-        <div className="stat-card-metric-row flex items-end">
-          <div
-            className={cn(
-              "stat-card-metric-value flex items-center justify-start",
-              showSparkline ? "w-1/2" : "w-full"
-            )}
-          >
-            <Skeleton className="h-12 w-24" />
-          </div>
-          {showSparkline ? (
-            <div className="stat-card-metric-trend w-1/2 flex items-center justify-center">
-              <Skeleton className="h-10 w-full" />
+      <DashboardStatCard
+        label={title}
+        loading
+        className="flex h-[184px] flex-col gap-4"
+        loadingFallback={
+          <>
+            <div className="stat-card-metric-row flex items-end">
+              <div
+                className={cn(
+                  "stat-card-metric-value flex items-center justify-start",
+                  showSparkline ? "w-1/2" : "w-full"
+                )}
+              >
+                <Skeleton className="h-12 w-24" />
+              </div>
+              {showSparkline ? (
+                <div className="stat-card-metric-trend w-1/2 flex items-center justify-center">
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ) : null}
             </div>
-          ) : null}
-        </div>
-        <div className="mt-auto leading-tight">
-          <Skeleton className="mb-1 h-4 w-32" />
-          <Skeleton className="h-3 w-20" />
-        </div>
-      </Card>
+            <div className="mt-auto leading-tight">
+              <Skeleton className="mb-1 h-4 w-32" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+          </>
+        }
+      />
     );
   }
 
   return (
-    <Card
-      className={cn("flex h-[184px] flex-col gap-4 p-4", onToggleMode ? "cursor-pointer" : "")}
-      onClick={handleCardClick}
-      onTouchStart={handleCardTouchStart}
-      onTouchMove={handleCardTouchMove}
-      onTouchEnd={handleCardTouchEnd}
-      onTouchCancel={() => {
-        cardTouchRef.current = null;
-      }}
-    >
-      <div className="mb-1 flex items-start justify-between gap-2">
-        <p className="text-sm text-muted-foreground">{title}</p>
-        {onToggleMode ? (
+    <DashboardStatCard
+      label={title}
+      headerRight={
+        onToggleMode ? (
           <button
             type="button"
             onClick={(event) => {
@@ -373,8 +370,17 @@ function StatCard({
           >
             {mode === "good" ? modeGoodLabel : modePoorLabel}
           </button>
-        ) : null}
-      </div>
+        ) : null
+      }
+      className={cn("flex h-[184px] flex-col gap-4", onToggleMode ? "cursor-pointer" : "")}
+      onClick={handleCardClick}
+      onTouchStart={handleCardTouchStart}
+      onTouchMove={handleCardTouchMove}
+      onTouchEnd={handleCardTouchEnd}
+      onTouchCancel={() => {
+        cardTouchRef.current = null;
+      }}
+    >
       <div
         className={cn(
           "flex min-h-0 flex-1 flex-col gap-1 transition-opacity duration-200",
@@ -413,7 +419,7 @@ function StatCard({
           <p className="text-sm">{manager}</p>
         </div>
       </div>
-    </Card>
+    </DashboardStatCard>
   );
 }
 
