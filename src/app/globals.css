@@ -165,8 +165,8 @@
   display: none !important;
 }
 
-@media (pointer: coarse) and (max-width: 639px),
-  (orientation: landscape) and (pointer: coarse) and (max-height: 540px) {
+@media (max-width: 639px),
+  (orientation: landscape) and (max-height: 540px) and (max-width: 1024px) {
   .mobile-landscape-scroll-shell {
     height: auto !important;
     min-height: auto !important;
@@ -200,7 +200,7 @@
   }
 }
 
-@media (orientation: landscape) and (pointer: coarse) and (max-height: 540px) {
+@media (orientation: landscape) and (max-height: 540px) and (max-width: 1024px) {
   .stats-cards-landscape-grid,
   .dashboard-widget-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
