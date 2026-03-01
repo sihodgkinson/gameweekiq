@@ -184,7 +184,7 @@ export function AdminOverviewClient() {
             >
               <Menu className="h-4 w-4" />
             </button>
-            <h1 className="text-base font-semibold tracking-tight sm:text-lg">Admin Overview</h1>
+            <h1 className="text-base font-semibold tracking-tight sm:text-lg">Overview</h1>
           </div>
           <div className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-blue-500/40 bg-blue-500/10 px-3 text-xs font-medium text-blue-700 dark:text-blue-300">
             <Shield className="h-3.5 w-3.5" />
