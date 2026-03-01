@@ -191,6 +191,7 @@ export function AdminOverviewClient() {
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as "users" | "leagues" | "tables")}
         options={tabOptions}
+        touchMode={useDrawerNav}
       />
 
       <DashboardTableCard loading={isLoading}>

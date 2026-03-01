@@ -26,6 +26,7 @@ interface LeagueSelectorProps {
   selectedLeagueId: number;
   currentGw: number;
   className?: string;
+  touchMode?: boolean;
 }
 
 interface AddLeagueResponse {
@@ -85,6 +86,7 @@ export function LeagueSelector({
   selectedLeagueId,
   currentGw,
   className,
+  touchMode = false,
 }: LeagueSelectorProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -334,7 +336,14 @@ export function LeagueSelector({
         router.push(`${currentPath}?${params.toString()}`, { scroll: false });
       }}
     >
-      <SelectTrigger size="sm" className={cn("w-56", className)}>
+      <SelectTrigger
+        size={touchMode ? "default" : "sm"}
+        className={cn(
+          "w-56",
+          touchMode && "h-10 px-4 text-base data-[size=default]:h-10 data-[size=sm]:h-10",
+          className
+        )}
+      >
         <SelectValue placeholder="Select League" />
       </SelectTrigger>
       <SelectContent className="w-64 max-w-[92vw] p-0 [&_[data-radix-select-viewport]]:p-0" align="end">

@@ -20,6 +20,7 @@ interface GameweekSelectorProps {
   className?: string; // NEW
   showArrows?: boolean;
   size?: "default" | "sm";
+  touchMode?: boolean;
 }
 
 export function GameweekSelector({
@@ -29,6 +30,7 @@ export function GameweekSelector({
   className,
   showArrows = true,
   size = "default",
+  touchMode = false,
 }: GameweekSelectorProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -93,8 +95,12 @@ export function GameweekSelector({
     <div className={cn("flex items-center gap-2", showArrows ? "w-fit sm:w-auto" : "w-full")}>
       <Select onValueChange={handleChange} value={String(selectedGw)}>
         <SelectTrigger
-          size={size === "sm" ? "sm" : "default"}
-          className={cn(showArrows ? "w-[112px]" : "w-full", className)}
+          size={touchMode ? "default" : size === "sm" ? "sm" : "default"}
+          className={cn(
+            showArrows ? "w-[112px]" : "w-full",
+            touchMode && "h-10 px-4 text-base data-[size=default]:h-10 data-[size=sm]:h-10",
+            className
+          )}
         >
           <SelectValue placeholder="GW" />
         </SelectTrigger>
@@ -113,7 +119,10 @@ export function GameweekSelector({
           size="icon"
           onClick={handlePrev}
           disabled={selectedGw <= 1}
-          className={cn(size === "sm" ? "h-8 w-8" : "h-12 w-12")}
+          className={cn(
+            size === "sm" ? "h-8 w-8" : "h-12 w-12",
+            touchMode && "h-10 w-10"
+          )}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -125,7 +134,10 @@ export function GameweekSelector({
           size="icon"
           onClick={handleNext}
           disabled={selectedGw >= maxGw}
-          className={cn(size === "sm" ? "h-8 w-8" : "h-12 w-12")}
+          className={cn(
+            size === "sm" ? "h-8 w-8" : "h-12 w-12",
+            touchMode && "h-10 w-10"
+          )}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
