@@ -4,6 +4,7 @@ import * as React from "react";
 import useSWR from "swr";
 import {
   Coins,
+  CircleGauge,
   Database,
   RefreshCw,
   Table2,
@@ -133,31 +134,25 @@ export function AdminOverviewClient() {
         },
       ],
     },
-    {
-      key: "admin",
-      label: "Admin",
-      items: [
-        {
-          key: "overview",
-          label: "Overview",
-          href: "/dashboard/admin/overview",
-          icon: Database,
-          active: true,
-          placeholder: false,
-        },
-      ],
-    },
   ];
 
   return (
     <AppShell
-      title="Overview"
+      title="Admin Console"
       sections={sidebarSections}
+      footerItem={{
+        key: "admin-console",
+        label: "Admin Console",
+        href: "/dashboard/admin",
+        icon: CircleGauge,
+        active: true,
+        placeholder: false,
+      }}
       useDrawerNav={useDrawerNav}
       mobileSidebarOpen={mobileSidebarOpen}
       onMobileSidebarOpenChange={setMobileSidebarOpen}
       headerRight={
-        <div className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-blue-500/40 bg-blue-500/10 px-3 text-xs font-medium text-blue-700 dark:text-blue-300">
+        <div className="inline-flex h-8 items-center gap-2 rounded-md border border-blue-500/40 bg-blue-500/10 px-3 text-xs font-medium text-blue-700 dark:text-blue-300">
           <Database className="h-3.5 w-3.5" />
           <span>Read-only</span>
         </div>

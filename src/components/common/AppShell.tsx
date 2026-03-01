@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Menu } from "lucide-react";
-import { AppSidebar, type AppSidebarSection } from "@/components/common/AppSidebar";
+import { AppSidebar, type AppSidebarItem, type AppSidebarSection } from "@/components/common/AppSidebar";
 import { cn } from "@/lib/utils";
 
 export function useAppShellNavigation() {
@@ -14,9 +14,10 @@ export function useAppShellNavigation() {
 
     const evaluateDrawerMode = () => {
       const isNarrowMobile = window.matchMedia("(max-width: 639px)").matches;
-      const isPhoneLandscape = window.matchMedia(
-        "(orientation: landscape) and (pointer: coarse) and (max-height: 540px)"
-      ).matches;
+      const isPhoneLandscape =
+        window.matchMedia("(orientation: landscape)").matches &&
+        window.innerHeight <= 540 &&
+        window.innerWidth <= 1024;
       setUseDrawerNav(isNarrowMobile || isPhoneLandscape);
     };
 
@@ -46,6 +47,7 @@ export function useAppShellNavigation() {
 interface AppShellProps {
   title: string;
   sections: AppSidebarSection[];
+  footerItem?: AppSidebarItem;
   useDrawerNav: boolean;
   mobileSidebarOpen: boolean;
   onMobileSidebarOpenChange: (open: boolean) => void;
@@ -59,6 +61,7 @@ interface AppShellProps {
 export function AppShell({
   title,
   sections,
+  footerItem,
   useDrawerNav,
   mobileSidebarOpen,
   onMobileSidebarOpenChange,
@@ -71,17 +74,26 @@ export function AppShell({
   return (
     <div
       data-drawer-nav={useDrawerNav ? "true" : "false"}
-      className="flex min-h-svh bg-background text-foreground sm:h-svh sm:overflow-hidden"
+      className={cn(
+        "flex min-h-svh bg-background text-foreground",
+        !useDrawerNav && "sm:h-svh sm:overflow-hidden"
+      )}
     >
       <AppSidebar
         useDrawerNav={useDrawerNav}
         mobileSidebarOpen={mobileSidebarOpen}
         onMobileSidebarOpenChange={onMobileSidebarOpenChange}
         sections={sections}
+        footerItem={footerItem}
         sidebarCollapsed={sidebarCollapsed}
       />
 
-      <div className="mobile-landscape-scroll-shell flex min-h-svh flex-1 flex-col sm:h-svh sm:min-h-0 sm:overflow-hidden">
+      <div
+        className={cn(
+          "mobile-landscape-scroll-shell flex min-h-svh flex-1 flex-col",
+          !useDrawerNav && "sm:h-svh sm:min-h-0 sm:overflow-hidden"
+        )}
+      >
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4">
           <div className="flex min-w-0 items-center gap-2">
             <button
@@ -102,7 +114,8 @@ export function AppShell({
 
         <main
           className={cn(
-            "mobile-landscape-scroll-main flex min-h-0 flex-1 flex-col gap-4 p-4 sm:gap-4 sm:overflow-hidden sm:p-4 md:p-4",
+            "mobile-landscape-scroll-main flex min-h-0 flex-1 flex-col gap-4 p-4 sm:gap-4 sm:p-4 md:p-4",
+            !useDrawerNav && "sm:overflow-hidden",
             mainClassName
           )}
           {...mainProps}

@@ -26,6 +26,7 @@ interface AppSidebarProps {
   onMobileSidebarOpenChange: (open: boolean) => void;
   sections: AppSidebarSection[];
   sidebarCollapsed?: boolean;
+  footerItem?: AppSidebarItem;
 }
 
 export function AppSidebar({
@@ -34,6 +35,7 @@ export function AppSidebar({
   onMobileSidebarOpenChange,
   sections,
   sidebarCollapsed = false,
+  footerItem,
 }: AppSidebarProps) {
   return (
     <>
@@ -72,11 +74,11 @@ export function AppSidebar({
               ) : null}
             </div>
 
-            <nav className={cn("mt-1 flex flex-col gap-1", sidebarCollapsed ? "px-2" : "px-3")}>
+            <nav className={cn("mt-2 flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")}>
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const itemClasses = cn(
-                  "inline-flex h-8 items-center gap-2 rounded-md px-2 text-sm transition-colors duration-150",
+                  "inline-flex h-8 items-center gap-2 rounded-md px-2.5 text-sm transition-colors duration-150",
                   item.active
                     ? "bg-muted/70 text-foreground"
                     : item.placeholder
@@ -117,17 +119,32 @@ export function AppSidebar({
           )}
         />
 
-        <div className={cn("space-y-4 pb-3", sidebarCollapsed ? "px-2" : "px-3")} data-sidebar-interactive="true">
+        <div className={cn("space-y-0.5 pb-3", sidebarCollapsed ? "px-2" : "px-3")} data-sidebar-interactive="true">
           <button
             type="button"
             disabled
-            className="inline-flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-foreground opacity-50 disabled:pointer-events-none"
+            className="inline-flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-sm text-foreground opacity-50 disabled:pointer-events-none"
             aria-label="Settings"
           >
             <Settings className="h-4 w-4" />
             <span>Settings</span>
           </button>
-          <AccountMenu className="w-full" />
+          {footerItem ? (
+            <Link
+              href={footerItem.href}
+              className={cn(
+                "inline-flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-sm transition-colors duration-150",
+                footerItem.active
+                  ? "bg-muted/70 text-foreground"
+                  : "text-foreground hover:bg-muted/70 hover:text-foreground",
+                sidebarCollapsed && "mx-auto w-8 justify-center px-0"
+              )}
+            >
+              <footerItem.icon className="h-4 w-4 shrink-0" />
+              {!sidebarCollapsed ? <span>{footerItem.label}</span> : null}
+            </Link>
+          ) : null}
+          <AccountMenu className="mt-2 w-full" />
         </div>
       </aside>
 
@@ -169,11 +186,11 @@ export function AppSidebar({
                   </p>
                 </div>
 
-                <nav className="flex flex-col gap-1">
+                <nav className="flex flex-col gap-0">
                   {section.items.map((item) => {
                     const Icon = item.icon;
                     const itemClasses = cn(
-                      "inline-flex h-8 items-center rounded-md px-3 text-sm transition-colors duration-150",
+                      "inline-flex h-8 items-center rounded-md px-2.5 text-sm transition-colors duration-150",
                       item.active
                         ? "bg-muted/70 text-foreground"
                         : item.placeholder
@@ -206,17 +223,31 @@ export function AppSidebar({
               </div>
             ))}
 
-            <div className="mt-auto space-y-4" data-sidebar-interactive="true">
+            <div className="mt-auto space-y-0" data-sidebar-interactive="true">
               <button
                 type="button"
                 disabled
-                className="inline-flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-foreground opacity-50 disabled:pointer-events-none"
+                className="inline-flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-sm text-foreground opacity-50 disabled:pointer-events-none"
                 aria-label="Settings"
               >
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
               </button>
-              <AccountMenu className="w-full" />
+              {footerItem ? (
+                <Link
+                  href={footerItem.href}
+                  className={cn(
+                    "inline-flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-sm transition-colors duration-150",
+                    footerItem.active
+                      ? "bg-muted/70 text-foreground"
+                      : "text-foreground hover:bg-muted/70 hover:text-foreground"
+                  )}
+                >
+                  <footerItem.icon className="h-4 w-4 shrink-0" />
+                  <span>{footerItem.label}</span>
+                </Link>
+              ) : null}
+              <AccountMenu className="mt-2 w-full" />
             </div>
           </aside>
         </>

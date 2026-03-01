@@ -10,8 +10,8 @@ import { GW1Table, GW1Standing } from "@/app/(dashboard)/[leagueID]/gw1/GW1Table
 import {
   AlertTriangle,
   CheckCircle2,
+  CircleGauge,
   Coins,
-  Database,
   Loader2,
   RefreshCw,
   Table2,
@@ -279,38 +279,15 @@ export default function DashboardClient({
     ],
     [activeView, sidebarQueryString]
   );
-  const adminSidebarItems = React.useMemo(
-    () => [
-      {
-        key: "overview",
-        label: "Overview",
-        href: "/dashboard/admin/overview",
-        icon: Database,
-        active: false,
-        placeholder: false,
-      },
-    ],
-    []
-  );
   const sidebarSections = React.useMemo<AppSidebarSection[]>(() => {
-    const sections: AppSidebarSection[] = [
+    return [
       {
         key: "leagueiq",
         label: "LeagueIQ",
         items: leagueIQSidebarItems,
       },
     ];
-
-    if (isAdmin) {
-      sections.push({
-        key: "admin",
-        label: "Admin",
-        items: adminSidebarItems,
-      });
-    }
-
-    return sections;
-  }, [adminSidebarItems, isAdmin, leagueIQSidebarItems]);
+  }, [leagueIQSidebarItems]);
 
   const prefetchKey = React.useCallback(
     async (key: string) => {
@@ -676,6 +653,18 @@ export default function DashboardClient({
     <AppShell
       title={LEAGUEIQ_VIEW_BY_KEY.tables.label}
       sections={sidebarSections}
+      footerItem={
+        isAdmin
+          ? {
+              key: "admin-console",
+              label: "Admin Console",
+              href: "/dashboard/admin",
+              icon: CircleGauge,
+              active: currentPath.startsWith("/dashboard/admin"),
+              placeholder: false,
+            }
+          : undefined
+      }
       useDrawerNav={useDrawerNav}
       mobileSidebarOpen={mobileSidebarOpen}
       onMobileSidebarOpenChange={setMobileSidebarOpen}
