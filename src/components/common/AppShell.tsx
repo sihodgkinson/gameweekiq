@@ -69,7 +69,10 @@ export function AppShell({
   children,
 }: AppShellProps) {
   return (
-    <div className="flex min-h-svh bg-background text-foreground sm:h-svh sm:overflow-hidden">
+    <div
+      data-drawer-nav={useDrawerNav ? "true" : "false"}
+      className="flex min-h-svh bg-background text-foreground sm:h-svh sm:overflow-hidden"
+    >
       <AppSidebar
         useDrawerNav={useDrawerNav}
         mobileSidebarOpen={mobileSidebarOpen}

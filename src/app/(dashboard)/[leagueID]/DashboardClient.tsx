@@ -774,9 +774,9 @@ export default function DashboardClient({
         </div>
       ) : null}
 
-      <div className="flex w-full min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="mobile-landscape-table-region-root flex w-full min-h-0 flex-1 flex-col overflow-hidden">
         {tab === "league" ? (
-          <div className="min-h-0 flex-1 overflow-hidden">
+          <div className="mobile-landscape-table-region min-h-0 flex-1 overflow-hidden">
             <LeagueTable
               standings={standings}
               isLoading={isLeagueDataLoading}
@@ -786,13 +786,13 @@ export default function DashboardClient({
         ) : null}
 
         {tab === "activity" ? (
-          <div className="min-h-0 flex-1 overflow-hidden">
+          <div className="mobile-landscape-table-region min-h-0 flex-1 overflow-hidden">
             <ActivityTab leagueId={selectedLeagueId} currentGw={currentGw} />
           </div>
         ) : null}
 
         {tab === "gw1" ? (
-          <div className="min-h-0 flex-1 overflow-hidden">
+          <div className="mobile-landscape-table-region min-h-0 flex-1 overflow-hidden">
             <GW1Table
               standings={gw1Standings}
               isLoading={!gw1Data && !gw1Error}

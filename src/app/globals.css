@@ -125,7 +125,82 @@
   }
 }
 
-@media (orientation: landscape) and (max-width: 932px) and (hover: none) {
+/* Use the same runtime mode as AppShell (useDrawerNav) for deterministic phone/tablet-mobile behavior. */
+[data-drawer-nav="true"] .mobile-landscape-scroll-shell {
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+}
+
+[data-drawer-nav="true"] .mobile-landscape-scroll-main {
+  overflow: visible !important;
+}
+
+[data-drawer-nav="true"] .dashboard-table-card,
+[data-drawer-nav="true"] .mobile-landscape-table,
+[data-drawer-nav="true"] .mobile-landscape-table-region-root,
+[data-drawer-nav="true"] .mobile-landscape-table-region {
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+[data-drawer-nav="true"] .dashboard-table-card-content,
+[data-drawer-nav="true"] .dashboard-table-container,
+[data-drawer-nav="true"] .mobile-landscape-table [data-slot="table-container"] {
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+[data-drawer-nav="true"] .admin-users-combined-col {
+  display: table-cell !important;
+}
+
+[data-drawer-nav="true"] .admin-users-split-col {
+  display: none !important;
+}
+
+@media (pointer: coarse) and (max-width: 639px),
+  (orientation: landscape) and (pointer: coarse) and (max-height: 540px) {
+  .mobile-landscape-scroll-shell {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  .mobile-landscape-scroll-main {
+    overflow: visible !important;
+  }
+
+  .mobile-landscape-table {
+    flex: 0 0 auto !important;
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .mobile-landscape-table [data-slot="table-container"] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .mobile-landscape-table-region-root,
+  .mobile-landscape-table-region {
+    flex: 0 0 auto !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+}
+
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 540px) {
   .stats-cards-landscape-grid,
   .dashboard-widget-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
@@ -144,22 +219,6 @@
   .stats-cards-landscape-grid .stat-card-team-name {
     font-size: 0.875rem;
     line-height: 1.25rem;
-  }
-
-  .mobile-landscape-scroll-shell {
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-  }
-
-  .mobile-landscape-scroll-main {
-    overflow: visible !important;
-  }
-
-  .mobile-landscape-table {
-    height: auto !important;
-    max-height: none !important;
-    overflow-y: visible !important;
   }
 
   .admin-users-combined-col {

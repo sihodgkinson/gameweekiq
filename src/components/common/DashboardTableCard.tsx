@@ -29,7 +29,7 @@ export function DashboardTableCard({
   return (
     <Card
       className={cn(
-        "bg-background p-4",
+        "dashboard-table-card bg-background p-4",
         fillHeight && "flex h-full min-h-0 flex-col overflow-hidden sm:flex-1",
         showHeader && "gap-3",
         className
@@ -42,7 +42,7 @@ export function DashboardTableCard({
         </div>
       ) : null}
 
-      <div className={cn("min-h-0", fillHeight && "flex-1")}>
+      <div className={cn("dashboard-table-card-content min-h-0", fillHeight && "flex-1")}>
         {loading ? (
           loadingFallback ?? (
             <div className="space-y-2">
