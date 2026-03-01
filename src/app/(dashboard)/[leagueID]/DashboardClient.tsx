@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useSWR, { useSWRConfig } from "swr";
 import { LeagueStatsCards } from "@/app/(dashboard)/[leagueID]/stats/StatsCards";
@@ -12,25 +11,20 @@ import {
   AlertTriangle,
   CheckCircle2,
   Coins,
+  Database,
   Loader2,
-  Menu,
-  Settings,
   RefreshCw,
   Table2,
   X,
 } from "lucide-react";
 import { GameweekSelector } from "@/components/common/GameweekSelector";
 import { LeagueSelector } from "@/components/common/LeagueSelector";
-import { AccountMenu } from "@/components/common/AccountMenu";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+  AppShell,
+  useAppShellNavigation,
+} from "@/components/common/AppShell";
+import type { AppSidebarSection } from "@/components/common/AppSidebar";
+import { DashboardTabRow, type DashboardTabOption } from "@/components/common/DashboardTabRow";
 import {
   LEAGUEIQ_VIEW_BY_KEY,
   LeagueIQView,
@@ -84,6 +78,7 @@ interface DashboardClientProps {
   maxGw: number;
   gw: number;
   activeView: LeagueIQView;
+  isAdmin: boolean;
 }
 
 const LIVE_POLL_LOCK_KEY = "fpl-live-refresh-lock";
@@ -167,20 +162,19 @@ export default function DashboardClient({
   maxGw,
   gw,
   activeView,
+  isAdmin,
 }: DashboardClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { useDrawerNav, mobileSidebarOpen, setMobileSidebarOpen } = useAppShellNavigation();
   const [showOrientationHint, setShowOrientationHint] = React.useState(false);
   const [showSwipeHint, setShowSwipeHint] = React.useState(false);
-  const [useDrawerNav, setUseDrawerNav] = React.useState(false);
   const [swipeGwFeedback, setSwipeGwFeedback] = React.useState<{
     fromGw: number;
     toGw: number;
   } | null>(null);
   const [tab, setTab] = React.useState<"league" | "activity" | "gw1">("league");
-  const sidebarCollapsed = false;
-  const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const swipeRef = React.useRef<{
     startX: number;
     startY: number;
@@ -285,6 +279,38 @@ export default function DashboardClient({
     ],
     [activeView, sidebarQueryString]
   );
+  const adminSidebarItems = React.useMemo(
+    () => [
+      {
+        key: "overview",
+        label: "Overview",
+        href: "/dashboard/admin/overview",
+        icon: Database,
+        active: false,
+        placeholder: false,
+      },
+    ],
+    []
+  );
+  const sidebarSections = React.useMemo<AppSidebarSection[]>(() => {
+    const sections: AppSidebarSection[] = [
+      {
+        key: "leagueiq",
+        label: "LeagueIQ",
+        items: leagueIQSidebarItems,
+      },
+    ];
+
+    if (isAdmin) {
+      sections.push({
+        key: "admin",
+        label: "Admin",
+        items: adminSidebarItems,
+      });
+    }
+
+    return sections;
+  }, [adminSidebarItems, isAdmin, leagueIQSidebarItems]);
 
   const prefetchKey = React.useCallback(
     async (key: string) => {
@@ -373,33 +399,6 @@ export default function DashboardClient({
     const interval = window.setInterval(refreshCurrentGw, LIVE_REFRESH_INTERVAL_MS);
     return () => window.clearInterval(interval);
   }, [currentGw, gw, isPollingLeader, mutate, selectedLeagueId]);
-
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const evaluateDrawerMode = () => {
-      const isNarrowMobile = window.matchMedia("(max-width: 639px)").matches;
-      const isPhoneLandscape = window.matchMedia(
-        "(orientation: landscape) and (pointer: coarse) and (max-height: 540px)"
-      ).matches;
-      setUseDrawerNav(isNarrowMobile || isPhoneLandscape);
-    };
-
-    evaluateDrawerMode();
-    window.addEventListener("resize", evaluateDrawerMode);
-    window.addEventListener("orientationchange", evaluateDrawerMode);
-
-    return () => {
-      window.removeEventListener("resize", evaluateDrawerMode);
-      window.removeEventListener("orientationchange", evaluateDrawerMode);
-    };
-  }, []);
-
-  React.useEffect(() => {
-    if (!useDrawerNav) {
-      setMobileSidebarOpen(false);
-    }
-  }, [useDrawerNav]);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -502,7 +501,7 @@ export default function DashboardClient({
 
   React.useEffect(() => {
     setMobileSidebarOpen(false);
-  }, [gw, selectedLeagueId]);
+  }, [gw, selectedLeagueId, setMobileSidebarOpen]);
 
   const handleRetryBackfill = React.useCallback(async () => {
     if (isRetryingBackfill) return;
@@ -652,369 +651,156 @@ export default function DashboardClient({
   const handleMobileSwipeCancel = React.useCallback(() => {
     swipeRef.current = null;
   }, []);
+  const tabOptions = React.useMemo<DashboardTabOption[]>(
+    () => [
+      { value: "league", label: "League" },
+      { value: "activity", label: "ManagerIQ" },
+      { value: "gw1", label: "GW 1 Team" },
+    ],
+    []
+  );
+  const gameweekSelectorControl = React.useMemo(
+    () => (
+      <GameweekSelector
+        selectedLeagueId={selectedLeagueId}
+        currentGw={currentGw}
+        maxGw={maxGw}
+        size="sm"
+        className="h-8 text-sm"
+      />
+    ),
+    [currentGw, maxGw, selectedLeagueId]
+  );
 
   return (
-    <div className="flex min-h-svh bg-background text-foreground sm:h-svh sm:overflow-hidden">
-      <aside
-        className={cn(
-          "hidden border-r border-border bg-muted/20 sm:flex sm:flex-col sm:transition-[width] sm:duration-200",
-          useDrawerNav && "sm:hidden",
-          sidebarCollapsed ? "sm:w-16" : "sm:w-64"
-        )}
-      >
-        <div
-          className={cn(
-            "flex h-16 items-center border-b border-border",
-            sidebarCollapsed ? "justify-center" : "justify-between gap-2",
-            sidebarCollapsed ? "px-2" : "px-3"
-          )}
-        >
-          {!sidebarCollapsed ? (
-            <Link href="/" className="flex items-center gap-2 overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-light.svg" alt="GameweekIQ logo" className="h-7 w-7 object-contain dark:hidden" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-dark.svg" alt="GameweekIQ logo" className="hidden h-7 w-7 object-contain dark:block" />
-              <span className="text-sm font-medium">GameweekIQ</span>
-            </Link>
-          ) : null}
-        </div>
-
-        <div className={cn("mt-4", sidebarCollapsed ? "px-2" : "px-3")}>
-          {!sidebarCollapsed ? (
-            <p className="px-2 pb-1 text-xs font-medium tracking-wide text-muted-foreground">
-              LeagueIQ
-            </p>
-          ) : null}
-        </div>
-
-        <nav className={cn("mt-1 flex flex-col gap-1", sidebarCollapsed ? "px-2" : "px-3")}>
-          {leagueIQSidebarItems.map((item) => {
-            const Icon = item.icon;
-            const itemClasses = cn(
-              "inline-flex h-8 items-center gap-2 rounded-md px-2 text-sm transition-colors duration-150",
-              item.active
-                ? "bg-muted/70 text-foreground"
-                : item.placeholder
-                  ? "text-foreground"
-                  : "text-foreground hover:bg-muted/70 hover:text-foreground",
-              sidebarCollapsed && "mx-auto w-8 justify-center px-0",
-              item.placeholder && "pointer-events-none cursor-default opacity-50"
-            );
-
-            if (item.placeholder) {
-              return (
-                <div key={item.key} className={itemClasses} aria-disabled="true">
-                  <Icon className="h-4 w-4 shrink-0" />
-                  {!sidebarCollapsed ? <span>{item.label}</span> : null}
-                </div>
-              );
-            }
-
-            return (
-              <Link
-                key={item.key}
-                href={item.href}
-                className={itemClasses}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed ? <span>{item.label}</span> : null}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div
-          className={cn(
-            "mt-1 flex flex-1 flex-col gap-3 overflow-y-auto",
-            sidebarCollapsed ? "px-2" : "px-3"
-          )}
-        >
-        </div>
-
-        <div className={cn("space-y-4 pb-3", sidebarCollapsed ? "px-2" : "px-3")} data-sidebar-interactive="true">
-          <button
-            type="button"
-            disabled
-            className="inline-flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-foreground opacity-50 disabled:pointer-events-none"
-            aria-label="Settings"
-          >
-            <Settings className="h-4 w-4" />
-            <span>Settings</span>
-          </button>
-          <AccountMenu
-            className={cn("w-full")}
-          />
-        </div>
-      </aside>
-
-      {useDrawerNav && mobileSidebarOpen ? (
+    <AppShell
+      title={LEAGUEIQ_VIEW_BY_KEY.tables.label}
+      sections={sidebarSections}
+      useDrawerNav={useDrawerNav}
+      mobileSidebarOpen={mobileSidebarOpen}
+      onMobileSidebarOpenChange={setMobileSidebarOpen}
+      sidebarCollapsed={false}
+      mainClassName="touch-pan-y"
+      mainProps={{
+        onTouchStart: handleMobileSwipeStart,
+        onTouchMove: handleMobileSwipeMove,
+        onTouchEnd: handleMobileSwipeEnd,
+        onTouchCancel: handleMobileSwipeCancel,
+      }}
+      headerRight={
         <>
-          <button
-            type="button"
-            className={cn("fixed inset-0 z-40 bg-background/70", !useDrawerNav && "sm:hidden")}
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-label="Close sidebar"
-          />
-          <aside className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-[86vw] max-w-[320px] flex-col gap-4 border-r border-border bg-background px-4 pb-4 shadow-2xl",
-            !useDrawerNav && "sm:hidden"
-          )}>
-            <div className="mx-[-16px] flex h-16 items-center justify-between border-b border-border px-4">
-              <Link href="/" className="flex items-center gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-light.svg" alt="GameweekIQ logo" className="h-7 w-7 object-contain dark:hidden" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-dark.svg" alt="GameweekIQ logo" className="hidden h-7 w-7 object-contain dark:block" />
-                <span className="text-sm font-medium">GameweekIQ</span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => setMobileSidebarOpen(false)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border"
-                aria-label="Close sidebar"
-              >
-                <X className="h-4 w-4" />
-              </button>
+          {hasActiveBackfillJobs ? (
+            <div className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 text-xs font-medium text-amber-700 dark:text-amber-300">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>Updating league data</span>
             </div>
-
-            <div>
-              <p className="pb-1 text-xs font-medium text-muted-foreground">
-                LeagueIQ
-              </p>
-            </div>
-
-            <nav className="flex flex-col gap-1">
-              {leagueIQSidebarItems.map((item) => {
-                const Icon = item.icon;
-                const itemClasses = cn(
-                  "inline-flex h-8 items-center rounded-md px-3 text-sm transition-colors duration-150",
-                  item.active
-                    ? "bg-muted/70 text-foreground"
-                    : item.placeholder
-                      ? "text-foreground"
-                      : "text-foreground hover:bg-muted/70 hover:text-foreground",
-                  item.placeholder && "pointer-events-none cursor-default opacity-50"
-                );
-
-                if (item.placeholder) {
-                  return (
-                    <div key={item.key} className={itemClasses} aria-disabled="true">
-                      <Icon className="mr-2 h-4 w-4 shrink-0" />
-                      {item.label}
-                    </div>
-                  );
-                }
-
-                return (
-                  <Link
-                    key={item.key}
-                    href={item.href}
-                    className={itemClasses}
-                  >
-                    <Icon className="mr-2 h-4 w-4 shrink-0" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="mt-auto space-y-4" data-sidebar-interactive="true">
-              <button
-                type="button"
-                disabled
-                className="inline-flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-foreground opacity-50 disabled:pointer-events-none"
-                aria-label="Settings"
-              >
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </button>
-              <AccountMenu
-                className="w-full"
-              />
-            </div>
-          </aside>
-        </>
-      ) : null}
-
-      <div className="mobile-landscape-scroll-shell flex min-h-svh flex-1 flex-col sm:h-svh sm:min-h-0 sm:overflow-hidden">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-3 backdrop-blur sm:px-4">
-          <div className="flex min-w-0 items-center gap-2">
+          ) : null}
+          {!hasActiveBackfillJobs && failedJobs > 0 ? (
             <button
               type="button"
-              onClick={() => setMobileSidebarOpen(true)}
-              className={cn(
-                "inline-flex h-9 w-9 items-center justify-center rounded-md border border-border",
-                !useDrawerNav && "sm:hidden"
-              )}
-              aria-label="Open sidebar"
+              onClick={handleRetryBackfill}
+              disabled={isRetryingBackfill}
+              className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-red-500/40 bg-red-500/10 px-3 text-left text-xs font-medium text-red-700 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-70 dark:text-red-300"
             >
-              <Menu className="h-4 w-4" />
+              <AlertTriangle className="h-3.5 w-3.5" />
+              <span>Failed to update league data. Retry.</span>
             </button>
-            <h1 className="text-base font-semibold tracking-tight sm:text-lg">
-              {LEAGUEIQ_VIEW_BY_KEY.tables.label}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            {hasActiveBackfillJobs ? (
-              <div className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 text-xs font-medium text-amber-700 dark:text-amber-300">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                <span>Updating league data</span>
-              </div>
-            ) : null}
-            {!hasActiveBackfillJobs && failedJobs > 0 ? (
-              <button
-                type="button"
-                onClick={handleRetryBackfill}
-                disabled={isRetryingBackfill}
-                className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-red-500/40 bg-red-500/10 px-3 text-left text-xs font-medium text-red-700 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-70 dark:text-red-300"
-              >
-                <AlertTriangle className="h-3.5 w-3.5" />
-                <span>Failed to update league data. Retry.</span>
-              </button>
-            ) : null}
-            {!hasActiveBackfillJobs && failedJobs === 0 && showBackfillSuccess ? (
-              <div className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-green-500/40 bg-green-500/10 px-3 text-xs font-medium text-green-700 dark:text-green-300">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>League data updated</span>
-              </div>
-            ) : null}
-            <LeagueSelector
-              leagues={leagues}
-              selectedLeagueId={selectedLeagueId}
-              currentGw={currentGw}
-              className="h-8 w-[170px] sm:w-[220px] text-sm"
-            />
-          </div>
-        </header>
-
-        {swipeGwFeedback ? (
-          <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center sm:hidden">
-            <div className="rounded-xl border border-border/60 bg-background/60 px-5 py-4 text-2xl font-semibold tracking-tight shadow-2xl backdrop-blur-md">
-              GW {swipeGwFeedback.fromGw} → {swipeGwFeedback.toGw}
+          ) : null}
+          {!hasActiveBackfillJobs && failedJobs === 0 && showBackfillSuccess ? (
+            <div className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-green-500/40 bg-green-500/10 px-3 text-xs font-medium text-green-700 dark:text-green-300">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>League data updated</span>
             </div>
+          ) : null}
+          <LeagueSelector
+            leagues={leagues}
+            selectedLeagueId={selectedLeagueId}
+            currentGw={currentGw}
+            className="h-8 w-[170px] sm:w-[220px] text-sm"
+          />
+        </>
+      }
+    >
+      {swipeGwFeedback ? (
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center sm:hidden">
+          <div className="rounded-xl border border-border/60 bg-background/60 px-5 py-4 text-2xl font-semibold tracking-tight shadow-2xl backdrop-blur-md">
+            GW {swipeGwFeedback.fromGw} → {swipeGwFeedback.toGw}
+          </div>
+        </div>
+      ) : null}
+
+      <LeagueStatsCards
+        stats={stats}
+        standings={standings}
+        leagueId={selectedLeagueId}
+        gw={gw}
+        currentGw={currentGw}
+        isLoading={isLeagueDataLoading}
+        hasError={Boolean(error)}
+      />
+
+      <DashboardTabRow
+        value={tab}
+        onValueChange={(value) => setTab(value as "league" | "activity" | "gw1")}
+        options={tabOptions}
+        rightSlot={gameweekSelectorControl}
+      />
+
+      {showSwipeHint ? (
+        <div className="sm:hidden flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+          <span>Swipe left/right to change GW.</span>
+          <button
+            type="button"
+            onClick={dismissSwipeHint}
+            aria-label="Dismiss swipe hint"
+            className="rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ) : null}
+
+      {showOrientationHint ? (
+        <div className="sm:hidden flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+          <span>Viewing compact table. Rotate to landscape for full columns.</span>
+          <button
+            type="button"
+            onClick={dismissOrientationHint}
+            aria-label="Dismiss orientation hint"
+            className="rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ) : null}
+
+      <div className="mobile-landscape-table-region-root flex w-full min-h-0 flex-1 flex-col overflow-hidden">
+        {tab === "league" ? (
+          <div className="mobile-landscape-table-region min-h-0 flex-1 overflow-hidden">
+            <LeagueTable
+              standings={standings}
+              isLoading={isLeagueDataLoading}
+              hasError={Boolean(error)}
+            />
           </div>
         ) : null}
 
-        <main
-          className="mobile-landscape-scroll-main touch-pan-y flex flex-1 min-h-0 flex-col gap-4 p-4 sm:gap-4 sm:overflow-hidden sm:p-4 md:p-4"
-          onTouchStart={handleMobileSwipeStart}
-          onTouchMove={handleMobileSwipeMove}
-          onTouchEnd={handleMobileSwipeEnd}
-          onTouchCancel={handleMobileSwipeCancel}
-        >
-          <LeagueStatsCards
-            stats={stats}
-            standings={standings}
-            leagueId={selectedLeagueId}
-            gw={gw}
-            currentGw={currentGw}
-            isLoading={isLeagueDataLoading}
-            hasError={Boolean(error)}
-          />
+        {tab === "activity" ? (
+          <div className="mobile-landscape-table-region min-h-0 flex-1 overflow-hidden">
+            <ActivityTab leagueId={selectedLeagueId} currentGw={currentGw} />
+          </div>
+        ) : null}
 
-          <div className="flex w-full items-center gap-2 sm:hidden">
-            <div className="min-w-0 flex-1">
-              <Select value={tab} onValueChange={(value) => setTab(value as "league" | "activity" | "gw1")}>
-                <SelectTrigger className="h-8 w-full text-sm">
-                  <SelectValue placeholder="Select table" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="league">League</SelectItem>
-                  <SelectItem value="activity">ManagerIQ</SelectItem>
-                  <SelectItem value="gw1">GW 1 Team</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <GameweekSelector
-              selectedLeagueId={selectedLeagueId}
-              currentGw={currentGw}
-              maxGw={maxGw}
-              size="sm"
-              className="h-8 text-sm"
+        {tab === "gw1" ? (
+          <div className="mobile-landscape-table-region min-h-0 flex-1 overflow-hidden">
+            <GW1Table
+              standings={gw1Standings}
+              isLoading={!gw1Data && !gw1Error}
+              hasError={Boolean(gw1Error)}
             />
           </div>
-
-          <div className="hidden w-full items-center justify-between gap-3 sm:flex">
-            <Tabs value={tab} onValueChange={(value) => setTab(value as "league" | "activity" | "gw1")}>
-              <TabsList className="h-8 p-[2px]">
-                <TabsTrigger value="league" type="button" className="px-3 sm:px-4">
-                  League
-                </TabsTrigger>
-                <TabsTrigger value="activity" type="button" className="px-3 sm:px-4">
-                  ManagerIQ
-                </TabsTrigger>
-                <TabsTrigger value="gw1" type="button" className="px-3 sm:px-4">
-                  GW 1 Team
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <GameweekSelector
-              selectedLeagueId={selectedLeagueId}
-              currentGw={currentGw}
-              maxGw={maxGw}
-              size="sm"
-              className="h-8 text-sm"
-            />
-          </div>
-
-          {showSwipeHint ? (
-            <div className="sm:hidden flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-              <span>Swipe left/right to change GW.</span>
-              <button
-                type="button"
-                onClick={dismissSwipeHint}
-                aria-label="Dismiss swipe hint"
-                className="rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ) : null}
-
-          {showOrientationHint ? (
-            <div className="sm:hidden flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-              <span>Viewing compact table. Rotate to landscape for full columns.</span>
-              <button
-                type="button"
-                onClick={dismissOrientationHint}
-                aria-label="Dismiss orientation hint"
-                className="rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ) : null}
-
-          <div className="flex w-full min-h-0 flex-1 flex-col overflow-hidden">
-            {tab === "league" ? (
-              <div className="min-h-0 flex-1 overflow-hidden">
-                <LeagueTable
-                  standings={standings}
-                  isLoading={isLeagueDataLoading}
-                  hasError={Boolean(error)}
-                />
-              </div>
-            ) : null}
-
-            {tab === "activity" ? (
-              <div className="min-h-0 flex-1 overflow-hidden">
-                <ActivityTab leagueId={selectedLeagueId} currentGw={currentGw} />
-              </div>
-            ) : null}
-
-            {tab === "gw1" ? (
-              <div className="min-h-0 flex-1 overflow-hidden">
-                <GW1Table
-                  standings={gw1Standings}
-                  isLoading={!gw1Data && !gw1Error}
-                  hasError={Boolean(gw1Error)}
-                />
-              </div>
-            ) : null}
-          </div>
-        </main>
+        ) : null}
       </div>
-    </div>
+    </AppShell>
   );
 }

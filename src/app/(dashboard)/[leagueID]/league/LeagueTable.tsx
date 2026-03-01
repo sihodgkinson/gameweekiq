@@ -4,6 +4,15 @@ import { ChevronUp, ChevronDown, Minus } from "lucide-react";
 import { EnrichedStanding } from "@/types/fpl";
 import { ResponsiveInfoCard } from "@/components/ui/responsive-info-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { DashboardTableCard } from "@/components/common/DashboardTableCard";
 
 interface LeagueTableProps {
   standings: EnrichedStanding[];
@@ -11,33 +20,32 @@ interface LeagueTableProps {
   hasError: boolean;
 }
 
-// ✅ Skeleton row
 function TableRowSkeleton() {
   return (
-    <tr className="animate-pulse">
-      <td className="p-2 sm:p-4">
+    <TableRow className="animate-pulse hover:bg-transparent">
+      <TableCell>
         <Skeleton className="h-4 w-6" />
-      </td>
-      <td className="p-2 sm:p-4">
-        <Skeleton className="h-4 w-32 mb-1" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="mb-1 h-4 w-32" />
         <Skeleton className="h-3 w-20" />
-      </td>
-      <td className="p-2 hidden md:table-cell sm:p-4">
+      </TableCell>
+      <TableCell className="hidden md:table-cell">
         <Skeleton className="h-4 w-28" />
-      </td>
-      <td className="p-2 sm:p-4 text-right">
-        <Skeleton className="h-4 w-10" />
-      </td>
-      <td className="p-2 sm:p-4 text-right hidden sm:table-cell">
-        <Skeleton className="h-4 w-8" />
-      </td>
-      <td className="p-2 sm:p-4 text-right hidden sm:table-cell">
-        <Skeleton className="h-4 w-8" />
-      </td>
-      <td className="p-2 sm:p-4 text-right">
-        <Skeleton className="h-4 w-10" />
-      </td>
-    </tr>
+      </TableCell>
+      <TableCell className="text-right">
+        <Skeleton className="ml-auto h-4 w-10" />
+      </TableCell>
+      <TableCell className="hidden text-right sm:table-cell">
+        <Skeleton className="ml-auto h-4 w-8" />
+      </TableCell>
+      <TableCell className="hidden text-right sm:table-cell">
+        <Skeleton className="ml-auto h-4 w-8" />
+      </TableCell>
+      <TableCell className="text-right">
+        <Skeleton className="ml-auto h-4 w-10" />
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -49,156 +57,143 @@ export function LeagueTable({
   if (hasError) return <div>Error loading standings</div>;
 
   return (
-    <div className="w-full overflow-x-auto rounded-md border border-border sm:h-full sm:overflow-auto mobile-landscape-table">
-      <table className="w-full table-auto text-sm">
-        <thead className="sticky top-0 z-10 bg-muted dark:bg-card [&_th]:h-10 [&_th]:!py-0 [&_th]:font-normal">
-          <tr className="border-b text-foreground font-normal">
-            <th className="p-2 sm:p-4 text-left w-3/100">Pos</th>
-            <th className="p-2 sm:p-4 text-left w-25/100">Team</th>
-            <th className="p-2 hidden md:table-cell sm:p-4 text-left w-22/100">
+    <DashboardTableCard className="mobile-landscape-table" fillHeight>
+      <Table className="w-full table-auto text-sm">
+        <TableHeader className="bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
+          <TableRow className="text-foreground hover:bg-transparent">
+            <TableHead className="text-left w-3/100">Pos</TableHead>
+            <TableHead className="text-left w-25/100">Team</TableHead>
+            <TableHead className="hidden md:table-cell text-left w-22/100">
               Manager
-            </th>
-            <th className="p-2 sm:p-4 text-right w-10/100">GW</th>
-            <th className="p-2 sm:p-4 text-right w-10/100 hidden sm:table-cell">
+            </TableHead>
+            <TableHead className="text-right w-10/100">GW</TableHead>
+            <TableHead className="text-right w-10/100 hidden sm:table-cell">
               Hit
-            </th>
-            <th className="p-2 sm:p-4 text-right w-10/100 hidden sm:table-cell">
+            </TableHead>
+            <TableHead className="text-right w-10/100 hidden sm:table-cell">
               Bench
-            </th>
-            <th className="p-2 sm:p-4 text-right w-10/100">Total</th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+            <TableHead className="text-right w-10/100">Total</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {isLoading
             ? [...Array(5)].map((_, i) => <TableRowSkeleton key={i} />)
             : standings.length > 0
-            ? standings.map((entry) => (
-                <tr
-                  key={entry.entry}
-                  className="border-b hover:bg-muted/30 last:border-b-0 transition-colors"
-                >
-                  {/* Position + movement */}
-                  <td className="p-2 sm:p-4 font-mono">
-                    <div className="flex items-center gap-1">
-                      <span>{entry.rank}</span>
-                      {entry.movement > 0 && (
-                        <ChevronUp className="h-4 w-4 text-green-600" />
-                      )}
-                      {entry.movement < 0 && (
-                        <ChevronDown className="h-4 w-4 text-red-600" />
-                      )}
-                      {entry.movement === 0 && (
-                        <Minus className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </div>
-                  </td>
+              ? standings.map((entry) => (
+                  <TableRow key={entry.entry} className="hover:bg-muted/30">
+                    <TableCell className="font-mono">
+                      <div className="flex items-center gap-1">
+                        <span>{entry.rank}</span>
+                        {entry.movement > 0 && (
+                          <ChevronUp className="h-4 w-4 text-green-600" />
+                        )}
+                        {entry.movement < 0 && (
+                          <ChevronDown className="h-4 w-4 text-red-600" />
+                        )}
+                        {entry.movement === 0 && (
+                          <Minus className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    </TableCell>
 
-                  {/* Team */}
-                  <td className="p-2 sm:p-4">
-                    <div className="font-medium">{entry.entry_name}</div>
-                    <div className="text-muted-foreground text-xs block md:hidden">
+                    <TableCell>
+                      <div className="font-medium">{entry.entry_name}</div>
+                      <div className="text-muted-foreground text-xs block md:hidden">
+                        {entry.player_name}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="hidden md:table-cell">
                       {entry.player_name}
-                    </div>
-                  </td>
+                    </TableCell>
 
-                  {/* Manager */}
-                  <td className="p-2 hidden md:table-cell sm:p-4">
-                    {entry.player_name}
-                  </td>
+                    <TableCell className="text-right font-mono">
+                      {entry.gwPoints > 0 ? (
+                        <ResponsiveInfoCard
+                          trigger={
+                            <button className="cursor-pointer underline decoration-dotted">
+                              {entry.gwPoints}
+                            </button>
+                          }
+                          content={
+                            entry.gwPlayers && entry.gwPlayers.length > 0 ? (
+                              <ul className="space-y-1 text-sm">
+                                {entry.gwPlayers.map((p, i) => (
+                                  <li
+                                    key={i}
+                                    className="flex items-center justify-between gap-4 text-muted-foreground"
+                                  >
+                                    <span className="pr-2">
+                                      {p.name}
+                                      {p.isCaptain && " (C)"}
+                                      {p.isViceCaptain && " (VC)"}
+                                    </span>
+                                    <span className="font-mono">{p.points}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-muted-foreground text-xs">No data</p>
+                            )
+                          }
+                          className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
+                        />
+                      ) : (
+                        <span>{entry.gwPoints}</span>
+                      )}
+                    </TableCell>
 
-                  {/* GW Points */}
-                  <td className="p-2 sm:p-4 text-right font-mono">
-                    {entry.gwPoints > 0 ? (
-                      <ResponsiveInfoCard
-                        trigger={
-                          <button className="cursor-pointer underline decoration-dotted">
-                            {entry.gwPoints}
-                          </button>
-                        }
-                        content={
-                          entry.gwPlayers && entry.gwPlayers.length > 0 ? (
-                            <ul className="space-y-1 text-sm">
-                              {entry.gwPlayers.map((p, i) => (
-                                <li
-                                  key={i}
-                                  className="flex items-center justify-between gap-4 text-muted-foreground"
-                                >
-                                  <span className="pr-2">
-                                    {p.name}
-                                    {p.isCaptain && " (C)"}
-                                    {p.isViceCaptain && " (VC)"}
-                                  </span>
-                                  <span className="font-mono">{p.points}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-muted-foreground text-xs">No data</p>
-                          )
-                        }
-                        className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
-                      />
-                    ) : (
-                      <span>{entry.gwPoints}</span>
-                    )}
-                  </td>
+                    <TableCell className="text-right font-mono hidden sm:table-cell">
+                      {entry.hit}
+                    </TableCell>
 
-                  {/* Hit */}
-                  <td className="p-2 sm:p-4 text-right font-mono hidden sm:table-cell">
-                    {entry.hit}
-                  </td>
+                    <TableCell className="text-right font-mono hidden sm:table-cell">
+                      {entry.benchPoints > 0 ? (
+                        <ResponsiveInfoCard
+                          trigger={
+                            <button className="cursor-pointer underline decoration-dotted">
+                              {entry.benchPoints}
+                            </button>
+                          }
+                          content={
+                            entry.benchPlayers && entry.benchPlayers.length > 0 ? (
+                              <ul className="space-y-1 text-sm">
+                                {entry.benchPlayers.map((p, i) => (
+                                  <li
+                                    key={i}
+                                    className="flex items-center justify-between gap-4 text-muted-foreground"
+                                  >
+                                    <span className="pr-2">{p.name}</span>
+                                    <span className="font-mono">{p.points}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-muted-foreground text-xs">No bench players</p>
+                            )
+                          }
+                          className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
+                        />
+                      ) : (
+                        <span>{entry.benchPoints}</span>
+                      )}
+                    </TableCell>
 
-                  {/* Bench Points */}
-                  <td className="p-2 sm:p-4 text-right font-mono hidden sm:table-cell">
-                    {entry.benchPoints > 0 ? (
-                      <ResponsiveInfoCard
-                        trigger={
-                          <button className="cursor-pointer underline decoration-dotted">
-                            {entry.benchPoints}
-                          </button>
-                        }
-                        content={
-                          entry.benchPlayers && entry.benchPlayers.length > 0 ? (
-                            <ul className="space-y-1 text-sm">
-                              {entry.benchPlayers.map((p, i) => (
-                                <li
-                                  key={i}
-                                  className="flex items-center justify-between gap-4 text-muted-foreground"
-                                >
-                                  <span className="pr-2">{p.name}</span>
-                                  <span className="font-mono">{p.points}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-muted-foreground text-xs">No bench players</p>
-                          )
-                        }
-                        className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
-                      />
-                    ) : (
-                      <span>{entry.benchPoints}</span>
-                    )}
-                  </td>
-
-                  {/* Total Points */}
-                  <td className="p-2 sm:p-4 text-right font-mono">
-                    {entry.totalPoints}
-                  </td>
-                </tr>
-              ))
-            : (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="text-center text-muted-foreground p-4"
-                >
-                  No standings available
-                </td>
-              </tr>
-            )}
-        </tbody>
-      </table>
-    </div>
+                    <TableCell className="text-right font-mono">
+                      {entry.totalPoints}
+                    </TableCell>
+                  </TableRow>
+                ))
+              : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground p-4">
+                      No standings available
+                    </TableCell>
+                  </TableRow>
+                )}
+        </TableBody>
+      </Table>
+    </DashboardTableCard>
   );
 }

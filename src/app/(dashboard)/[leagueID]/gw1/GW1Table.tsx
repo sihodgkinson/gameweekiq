@@ -3,6 +3,15 @@
 import { ChevronUp, ChevronDown, Minus } from "lucide-react";
 import { ResponsiveInfoCard } from "@/components/ui/responsive-info-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { DashboardTableCard } from "@/components/common/DashboardTableCard";
 
 export interface GW1Standing {
   entry: number;
@@ -33,27 +42,27 @@ interface GW1TableProps {
 
 function TableRowSkeleton() {
   return (
-    <tr className="animate-pulse">
-      <td className="p-2 sm:p-4">
+    <TableRow className="animate-pulse hover:bg-transparent">
+      <TableCell>
         <Skeleton className="h-4 w-6" />
-      </td>
-      <td className="p-2 sm:p-4">
+      </TableCell>
+      <TableCell>
         <Skeleton className="mb-1 h-4 w-32" />
         <Skeleton className="h-3 w-20" />
-      </td>
-      <td className="hidden p-2 md:table-cell sm:p-4">
+      </TableCell>
+      <TableCell className="hidden md:table-cell">
         <Skeleton className="h-4 w-28" />
-      </td>
-      <td className="p-2 text-right sm:p-4">
-        <Skeleton className="h-4 w-10" />
-      </td>
-      <td className="hidden p-2 text-right sm:table-cell sm:p-4">
-        <Skeleton className="h-4 w-8" />
-      </td>
-      <td className="p-2 text-right sm:p-4">
-        <Skeleton className="h-4 w-10" />
-      </td>
-    </tr>
+      </TableCell>
+      <TableCell className="text-right">
+        <Skeleton className="ml-auto h-4 w-10" />
+      </TableCell>
+      <TableCell className="hidden text-right sm:table-cell">
+        <Skeleton className="ml-auto h-4 w-8" />
+      </TableCell>
+      <TableCell className="text-right">
+        <Skeleton className="ml-auto h-4 w-10" />
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -61,30 +70,30 @@ export function GW1Table({ standings, isLoading, hasError }: GW1TableProps) {
   if (hasError) return <div>Error loading GW1 table</div>;
 
   return (
-    <div className="mobile-landscape-table w-full overflow-x-auto rounded-md border border-border sm:h-full sm:overflow-auto">
-      <table className="w-full table-auto text-sm">
-        <thead className="sticky top-0 z-10 bg-muted dark:bg-card [&_th]:h-10 [&_th]:!py-0 [&_th]:font-normal">
-          <tr className="border-b font-normal text-foreground">
-            <th className="w-3/100 p-2 text-left sm:p-4">Pos</th>
-            <th className="w-25/100 p-2 text-left sm:p-4">Team</th>
-            <th className="hidden w-22/100 p-2 text-left md:table-cell sm:p-4">Manager</th>
-            <th className="w-10/100 p-2 text-right sm:p-4">GW</th>
-            <th className="hidden w-10/100 p-2 text-right sm:table-cell sm:p-4">
+    <DashboardTableCard className="mobile-landscape-table" fillHeight>
+      <Table className="w-full table-auto text-sm">
+        <TableHeader className="bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
+          <TableRow className="text-foreground hover:bg-transparent">
+            <TableHead className="w-3/100 text-left">Pos</TableHead>
+            <TableHead className="w-25/100 text-left">Team</TableHead>
+            <TableHead className="hidden w-22/100 text-left md:table-cell">Manager</TableHead>
+            <TableHead className="w-10/100 text-right">GW</TableHead>
+            <TableHead className="hidden w-10/100 text-right sm:table-cell">
               Bench
-            </th>
-            <th className="w-10/100 p-2 text-right sm:p-4">Total</th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+            <TableHead className="w-10/100 text-right">Total</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {isLoading
             ? [...Array(5)].map((_, i) => <TableRowSkeleton key={i} />)
             : standings.length > 0
               ? standings.map((entry) => (
-                  <tr
+                  <TableRow
                     key={entry.entry}
-                    className="border-b transition-colors last:border-b-0 hover:bg-muted/30"
+                    className="hover:bg-muted/30"
                   >
-                    <td className="p-2 font-mono sm:p-4">
+                    <TableCell className="font-mono">
                       <div className="flex items-center gap-1">
                         <span>{entry.rank}</span>
                         {entry.movement > 0 && (
@@ -97,18 +106,18 @@ export function GW1Table({ standings, isLoading, hasError }: GW1TableProps) {
                           <Minus className="h-4 w-4 text-muted-foreground" />
                         )}
                       </div>
-                    </td>
+                    </TableCell>
 
-                    <td className="p-2 sm:p-4">
+                    <TableCell>
                       <div className="font-medium">{entry.entry_name}</div>
                       <div className="block text-xs text-muted-foreground md:hidden">
                         {entry.player_name}
                       </div>
-                    </td>
+                    </TableCell>
 
-                    <td className="hidden p-2 md:table-cell sm:p-4">{entry.player_name}</td>
+                    <TableCell className="hidden md:table-cell">{entry.player_name}</TableCell>
 
-                    <td className="p-2 text-right font-mono sm:p-4">
+                    <TableCell className="text-right font-mono">
                       {entry.gwPoints > 0 ? (
                         <ResponsiveInfoCard
                           trigger={
@@ -142,9 +151,9 @@ export function GW1Table({ standings, isLoading, hasError }: GW1TableProps) {
                       ) : (
                         <span>{entry.gwPoints}</span>
                       )}
-                    </td>
+                    </TableCell>
 
-                    <td className="hidden p-2 text-right font-mono sm:table-cell sm:p-4">
+                    <TableCell className="hidden text-right font-mono sm:table-cell">
                       {entry.benchPoints > 0 ? (
                         <ResponsiveInfoCard
                           trigger={
@@ -174,20 +183,20 @@ export function GW1Table({ standings, isLoading, hasError }: GW1TableProps) {
                       ) : (
                         <span>{entry.benchPoints}</span>
                       )}
-                    </td>
+                    </TableCell>
 
-                    <td className="p-2 text-right font-mono sm:p-4">{entry.totalPoints}</td>
-                  </tr>
+                    <TableCell className="text-right font-mono">{entry.totalPoints}</TableCell>
+                  </TableRow>
                 ))
               : (
-                  <tr>
-                    <td colSpan={6} className="p-4 text-center text-muted-foreground">
+                  <TableRow>
+                    <TableCell colSpan={6} className="p-4 text-center text-muted-foreground">
                       No standings available
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </DashboardTableCard>
   );
 }

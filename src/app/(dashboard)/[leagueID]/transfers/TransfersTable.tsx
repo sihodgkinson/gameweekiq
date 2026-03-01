@@ -2,7 +2,16 @@
 
 import useSWR from "swr";
 import { useSearchParams } from "next/navigation";
+import { DashboardTableCard } from "@/components/common/DashboardTableCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -15,22 +24,21 @@ interface TransfersResponse {
   }[];
 }
 
-// ✅ Skeleton row
 function TransferRowSkeleton() {
   return (
-    <tr className="animate-pulse">
-      <td className="p-2 sm:p-4">
-        <Skeleton className="h-4 w-32 mb-1" />
+    <TableRow className="animate-pulse hover:bg-transparent">
+      <TableCell>
+        <Skeleton className="mb-1 h-4 w-32" />
         <Skeleton className="h-3 w-20" />
-      </td>
-      <td className="p-2 sm:p-4 hidden sm:table-cell">
+      </TableCell>
+      <TableCell className="hidden sm:table-cell">
         <Skeleton className="h-4 w-28" />
-      </td>
-      <td className="p-2 sm:p-4">
-        <Skeleton className="h-4 w-40 mb-1" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="mb-1 h-4 w-40" />
         <Skeleton className="h-4 w-36" />
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -53,59 +61,50 @@ export function TransfersTab({
   if (error) return <div>Error loading transfers</div>;
 
   return (
-    <div
-      className="w-full overflow-x-auto rounded-md border border-border sm:h-full sm:overflow-auto mobile-landscape-table"
-    >
-      <table className="w-full table-auto text-sm">
-        <thead className="sticky top-0 z-10 bg-muted [&_th]:h-10 [&_th]:!py-0 [&_th]:font-normal">
-          <tr className="border-b text-foreground font-normal bg-card">
-            <th className="p-2 sm:p-4 text-left w-1/3">Team</th>
-            <th className="p-2 sm:p-4 text-left w-1/3 hidden sm:table-cell">
+    <DashboardTableCard className="mobile-landscape-table" fillHeight>
+      <Table className="w-full table-auto text-sm">
+        <TableHeader className="bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
+          <TableRow className="text-foreground hover:bg-transparent">
+            <TableHead className="w-1/3 text-left">Team</TableHead>
+            <TableHead className="hidden w-1/3 text-left sm:table-cell">
               Manager
-            </th>
-            <th className="p-2 sm:p-4 text-left w-1/3">Transfers</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* ✅ If no data yet, show 5 skeleton rows */}
+            </TableHead>
+            <TableHead className="w-1/3 text-left">Transfers</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {!data
             ? [...Array(5)].map((_, i) => <TransferRowSkeleton key={i} />)
             : data.map((row, idx) => (
-                <tr
-                  key={idx}
-                  className="border-b hover:bg-muted/30 last:border-b-0 transition-colors"
-                >
-                  {/* Team (with Manager underneath on mobile) */}
-                  <td className="p-2 sm:p-4">
+                <TableRow key={idx} className="hover:bg-muted/30">
+                  <TableCell>
                     <div className="font-medium">{row.team}</div>
-                    <div className="text-muted-foreground text-xs mt-0.5 block sm:hidden">
+                    <div className="mt-0.5 block text-xs text-muted-foreground sm:hidden">
                       {row.manager}
                     </div>
-                  </td>
+                  </TableCell>
 
-                  {/* Manager (hidden on mobile) */}
-                  <td className="p-2 sm:p-4 hidden sm:table-cell">
+                  <TableCell className="hidden sm:table-cell">
                     {row.manager}
-                  </td>
+                  </TableCell>
 
-                  {/* Transfers */}
-                  <td className="p-2 sm:p-4">
+                  <TableCell>
                     {row.transfers.length > 0 ? (
                       <div className="space-y-1">
                         {row.transfers.map((t, i) => (
                           <div key={i}>
-                            {t.out} → {t.in}
+                            {t.out} {"->"} {t.in}
                           </div>
                         ))}
                       </div>
                     ) : (
                       <span className="text-muted-foreground">—</span>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </DashboardTableCard>
   );
 }
