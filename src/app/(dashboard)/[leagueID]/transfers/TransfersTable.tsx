@@ -27,14 +27,14 @@ interface TransfersResponse {
 function TransferRowSkeleton() {
   return (
     <TableRow className="animate-pulse hover:bg-transparent">
-      <TableCell className="p-2 sm:p-4">
+      <TableCell>
         <Skeleton className="mb-1 h-4 w-32" />
         <Skeleton className="h-3 w-20" />
       </TableCell>
-      <TableCell className="hidden p-2 sm:table-cell sm:p-4">
+      <TableCell className="hidden sm:table-cell">
         <Skeleton className="h-4 w-28" />
       </TableCell>
-      <TableCell className="p-2 sm:p-4">
+      <TableCell>
         <Skeleton className="mb-1 h-4 w-40" />
         <Skeleton className="h-4 w-36" />
       </TableCell>
@@ -65,11 +65,11 @@ export function TransfersTab({
       <Table className="w-full table-auto text-sm">
         <TableHeader className="sticky top-0 z-10 bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
           <TableRow className="text-foreground hover:bg-transparent">
-            <TableHead className="w-1/3 p-2 text-left sm:p-4">Team</TableHead>
-            <TableHead className="hidden w-1/3 p-2 text-left sm:table-cell sm:p-4">
+            <TableHead className="w-1/3 text-left">Team</TableHead>
+            <TableHead className="hidden w-1/3 text-left sm:table-cell">
               Manager
             </TableHead>
-            <TableHead className="w-1/3 p-2 text-left sm:p-4">Transfers</TableHead>
+            <TableHead className="w-1/3 text-left">Transfers</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -77,18 +77,18 @@ export function TransfersTab({
             ? [...Array(5)].map((_, i) => <TransferRowSkeleton key={i} />)
             : data.map((row, idx) => (
                 <TableRow key={idx} className="hover:bg-muted/30">
-                  <TableCell className="p-2 sm:p-4">
+                  <TableCell>
                     <div className="font-medium">{row.team}</div>
                     <div className="mt-0.5 block text-xs text-muted-foreground sm:hidden">
                       {row.manager}
                     </div>
                   </TableCell>
 
-                  <TableCell className="hidden p-2 sm:table-cell sm:p-4">
+                  <TableCell className="hidden sm:table-cell">
                     {row.manager}
                   </TableCell>
 
-                  <TableCell className="p-2 sm:p-4">
+                  <TableCell>
                     {row.transfers.length > 0 ? (
                       <div className="space-y-1">
                         {row.transfers.map((t, i) => (

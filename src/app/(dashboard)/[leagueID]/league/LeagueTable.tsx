@@ -23,26 +23,26 @@ interface LeagueTableProps {
 function TableRowSkeleton() {
   return (
     <TableRow className="animate-pulse hover:bg-transparent">
-      <TableCell className="p-2 sm:p-4">
+      <TableCell>
         <Skeleton className="h-4 w-6" />
       </TableCell>
-      <TableCell className="p-2 sm:p-4">
+      <TableCell>
         <Skeleton className="mb-1 h-4 w-32" />
         <Skeleton className="h-3 w-20" />
       </TableCell>
-      <TableCell className="hidden p-2 md:table-cell sm:p-4">
+      <TableCell className="hidden md:table-cell">
         <Skeleton className="h-4 w-28" />
       </TableCell>
-      <TableCell className="p-2 text-right sm:p-4">
+      <TableCell className="text-right">
         <Skeleton className="ml-auto h-4 w-10" />
       </TableCell>
-      <TableCell className="hidden p-2 text-right sm:table-cell sm:p-4">
+      <TableCell className="hidden text-right sm:table-cell">
         <Skeleton className="ml-auto h-4 w-8" />
       </TableCell>
-      <TableCell className="hidden p-2 text-right sm:table-cell sm:p-4">
+      <TableCell className="hidden text-right sm:table-cell">
         <Skeleton className="ml-auto h-4 w-8" />
       </TableCell>
-      <TableCell className="p-2 text-right sm:p-4">
+      <TableCell className="text-right">
         <Skeleton className="ml-auto h-4 w-10" />
       </TableCell>
     </TableRow>
@@ -61,19 +61,19 @@ export function LeagueTable({
       <Table className="w-full table-auto text-sm">
         <TableHeader className="sticky top-0 z-10 bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
           <TableRow className="text-foreground hover:bg-transparent">
-            <TableHead className="p-2 sm:p-4 text-left w-3/100">Pos</TableHead>
-            <TableHead className="p-2 sm:p-4 text-left w-25/100">Team</TableHead>
-            <TableHead className="p-2 hidden md:table-cell sm:p-4 text-left w-22/100">
+            <TableHead className="text-left w-3/100">Pos</TableHead>
+            <TableHead className="text-left w-25/100">Team</TableHead>
+            <TableHead className="hidden md:table-cell text-left w-22/100">
               Manager
             </TableHead>
-            <TableHead className="p-2 sm:p-4 text-right w-10/100">GW</TableHead>
-            <TableHead className="p-2 sm:p-4 text-right w-10/100 hidden sm:table-cell">
+            <TableHead className="text-right w-10/100">GW</TableHead>
+            <TableHead className="text-right w-10/100 hidden sm:table-cell">
               Hit
             </TableHead>
-            <TableHead className="p-2 sm:p-4 text-right w-10/100 hidden sm:table-cell">
+            <TableHead className="text-right w-10/100 hidden sm:table-cell">
               Bench
             </TableHead>
-            <TableHead className="p-2 sm:p-4 text-right w-10/100">Total</TableHead>
+            <TableHead className="text-right w-10/100">Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -82,7 +82,7 @@ export function LeagueTable({
             : standings.length > 0
               ? standings.map((entry) => (
                   <TableRow key={entry.entry} className="hover:bg-muted/30">
-                    <TableCell className="p-2 sm:p-4 font-mono">
+                    <TableCell className="font-mono">
                       <div className="flex items-center gap-1">
                         <span>{entry.rank}</span>
                         {entry.movement > 0 && (
@@ -97,18 +97,18 @@ export function LeagueTable({
                       </div>
                     </TableCell>
 
-                    <TableCell className="p-2 sm:p-4">
+                    <TableCell>
                       <div className="font-medium">{entry.entry_name}</div>
                       <div className="text-muted-foreground text-xs block md:hidden">
                         {entry.player_name}
                       </div>
                     </TableCell>
 
-                    <TableCell className="p-2 hidden md:table-cell sm:p-4">
+                    <TableCell className="hidden md:table-cell">
                       {entry.player_name}
                     </TableCell>
 
-                    <TableCell className="p-2 sm:p-4 text-right font-mono">
+                    <TableCell className="text-right font-mono">
                       {entry.gwPoints > 0 ? (
                         <ResponsiveInfoCard
                           trigger={
@@ -144,11 +144,11 @@ export function LeagueTable({
                       )}
                     </TableCell>
 
-                    <TableCell className="p-2 sm:p-4 text-right font-mono hidden sm:table-cell">
+                    <TableCell className="text-right font-mono hidden sm:table-cell">
                       {entry.hit}
                     </TableCell>
 
-                    <TableCell className="p-2 sm:p-4 text-right font-mono hidden sm:table-cell">
+                    <TableCell className="text-right font-mono hidden sm:table-cell">
                       {entry.benchPoints > 0 ? (
                         <ResponsiveInfoCard
                           trigger={
@@ -180,7 +180,7 @@ export function LeagueTable({
                       )}
                     </TableCell>
 
-                    <TableCell className="p-2 sm:p-4 text-right font-mono">
+                    <TableCell className="text-right font-mono">
                       {entry.totalPoints}
                     </TableCell>
                   </TableRow>
