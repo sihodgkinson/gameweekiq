@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Menu } from "lucide-react";
-import { AppSidebar, type AppSidebarSection } from "@/components/common/AppSidebar";
+import { AppSidebar, type AppSidebarItem, type AppSidebarSection } from "@/components/common/AppSidebar";
 import { cn } from "@/lib/utils";
 
 export function useAppShellNavigation() {
@@ -46,6 +46,7 @@ export function useAppShellNavigation() {
 interface AppShellProps {
   title: string;
   sections: AppSidebarSection[];
+  footerItem?: AppSidebarItem;
   useDrawerNav: boolean;
   mobileSidebarOpen: boolean;
   onMobileSidebarOpenChange: (open: boolean) => void;
@@ -59,6 +60,7 @@ interface AppShellProps {
 export function AppShell({
   title,
   sections,
+  footerItem,
   useDrawerNav,
   mobileSidebarOpen,
   onMobileSidebarOpenChange,
@@ -78,6 +80,7 @@ export function AppShell({
         mobileSidebarOpen={mobileSidebarOpen}
         onMobileSidebarOpenChange={onMobileSidebarOpenChange}
         sections={sections}
+        footerItem={footerItem}
         sidebarCollapsed={sidebarCollapsed}
       />
 
