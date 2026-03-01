@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { AppShell, useAppShellNavigation } from "@/components/common/AppShell";
 import type { AppSidebarSection } from "@/components/common/AppSidebar";
+import { DashboardTabRow, type DashboardTabOption } from "@/components/common/DashboardTabRow";
 import {
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ResponsiveInfoCard } from "@/components/ui/responsive-info-card";
 import { DashboardStatCard, DashboardStatGrid } from "@/components/common/DashboardStatCard";
 import { DashboardTableCard } from "@/components/common/DashboardTableCard";
 
@@ -26,6 +28,25 @@ interface AdminOverviewResponse {
   uniqueTrackedLeagues: number;
   cacheRows: number;
   totalRows: number;
+  usersTable: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    authMethod: string | null;
+    createdAt: string | null;
+    lastSignInAt: string | null;
+    linkedLeagues: number;
+    linkedLeagueDetails: Array<{
+      leagueId: number;
+      leagueName: string | null;
+    }>;
+  }[];
+  leaguesTable: {
+    leagueId: number;
+    leagueName: string | null;
+    linkedUsers: number;
+    linkedRows: number;
+  }[];
   rowsBySource: {
     tableName: string;
     rows: number;
@@ -47,13 +68,33 @@ function formatCount(value: number | null | undefined): string {
   return new Intl.NumberFormat("en-GB").format(value as number);
 }
 
+function formatDate(value: string | null | undefined): string {
+  if (!value) return "—";
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return "—";
+  return new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(parsed));
+}
+
 export function AdminOverviewClient() {
   const { useDrawerNav, mobileSidebarOpen, setMobileSidebarOpen } = useAppShellNavigation();
+  const [activeTab, setActiveTab] = React.useState<"users" | "leagues" | "tables">("users");
 
   const { data, error, isLoading } = useSWR<AdminOverviewResponse>("/api/admin/overview", fetcher, {
     refreshInterval: 60_000,
     revalidateOnFocus: true,
   });
+
+  const tabOptions = React.useMemo<DashboardTabOption[]>(
+    () => [
+      { value: "users", label: "Users" },
+      { value: "leagues", label: "Leagues" },
+      { value: "tables", label: "Tables" },
+    ],
+    []
+  );
 
   const sidebarSections: AppSidebarSection[] = [
     {
@@ -145,25 +186,122 @@ export function AdminOverviewClient() {
         />
       </DashboardStatGrid>
 
+      <DashboardTabRow
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "users" | "leagues" | "tables")}
+        options={tabOptions}
+      />
+
       <DashboardTableCard loading={isLoading}>
         {!isLoading ? (
             <Table>
-              <TableHeader className="bg-background [&_th]:font-semibold">
-                <TableRow className="text-foreground hover:bg-transparent">
-                  <TableHead className="w-[45%]">Table</TableHead>
-                  <TableHead>Schema</TableHead>
-                  <TableHead className="text-right">Rows</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data?.rowsBySource?.map((row) => (
-                  <TableRow key={row.tableName}>
-                    <TableCell className="font-mono text-xs sm:text-sm">{row.tableName}</TableCell>
-                    <TableCell>{row.source}</TableCell>
-                    <TableCell className="text-right font-mono">{formatCount(row.rows)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+              {activeTab === "users" ? (
+                <>
+                  <TableHeader className="bg-background [&_th]:font-semibold">
+                    <TableRow className="text-foreground hover:bg-transparent">
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Auth</TableHead>
+                      <TableHead className="text-center">Leagues</TableHead>
+                      <TableHead className="hidden text-right md:table-cell">Created</TableHead>
+                      <TableHead className="hidden text-right md:table-cell">Last Sign-in</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data?.usersTable?.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell>{row.name ?? "—"}</TableCell>
+                        <TableCell className="text-xs sm:text-sm">
+                          {row.email ?? "—"}
+                        </TableCell>
+                        <TableCell>{row.authMethod ?? "—"}</TableCell>
+                        <TableCell className="text-center font-mono">
+                          {row.linkedLeagues > 0 ? (
+                            <ResponsiveInfoCard
+                              trigger={
+                                <button className="cursor-pointer underline decoration-dotted">
+                                  {formatCount(row.linkedLeagues)}
+                                </button>
+                              }
+                              content={
+                                <ul className="space-y-1 text-sm">
+                                  {row.linkedLeagueDetails.map((league) => (
+                                    <li
+                                      key={`${row.id}-${league.leagueId}`}
+                                      className="flex items-center justify-between gap-4"
+                                    >
+                                      <span className="text-muted-foreground">
+                                        {league.leagueName ?? `League ${league.leagueId}`}
+                                      </span>
+                                      <span className="font-mono text-right">{league.leagueId}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              }
+                              className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
+                            />
+                          ) : (
+                            <span>{formatCount(row.linkedLeagues)}</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden text-right font-mono md:table-cell">
+                          {formatDate(row.createdAt)}
+                        </TableCell>
+                        <TableCell className="hidden text-right font-mono md:table-cell">
+                          {formatDate(row.lastSignInAt)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </>
+              ) : null}
+
+              {activeTab === "leagues" ? (
+                <>
+                  <TableHeader className="bg-background [&_th]:font-semibold">
+                    <TableRow className="text-foreground hover:bg-transparent">
+                      <TableHead>League</TableHead>
+                      <TableHead className="text-right">Users</TableHead>
+                      <TableHead className="text-right">Links</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data?.leaguesTable?.map((row) => (
+                      <TableRow key={row.leagueId}>
+                        <TableCell>
+                          <div className="font-medium">{row.leagueName ?? `League ${row.leagueId}`}</div>
+                          <div className="text-xs text-muted-foreground">
+                            ID: {row.leagueId}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-mono">{formatCount(row.linkedUsers)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCount(row.linkedRows)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </>
+              ) : null}
+
+              {activeTab === "tables" ? (
+                <>
+                  <TableHeader className="bg-background [&_th]:font-semibold">
+                    <TableRow className="text-foreground hover:bg-transparent">
+                      <TableHead className="w-[45%]">Table</TableHead>
+                      <TableHead>Schema</TableHead>
+                      <TableHead className="text-right">Rows</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data?.rowsBySource?.map((row) => (
+                      <TableRow key={row.tableName}>
+                        <TableCell className="text-xs sm:text-sm">{row.tableName}</TableCell>
+                        <TableCell>{row.source}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCount(row.rows)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </>
+              ) : null}
             </Table>
           ) : null}
       </DashboardTableCard>
