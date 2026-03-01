@@ -247,7 +247,7 @@ export function AppSidebar({
                   <span>{footerItem.label}</span>
                 </Link>
               ) : null}
-              <AccountMenu className="mt-2 w-full" />
+              <AccountMenu className="mt-2 w-full" touchMode />
             </div>
           </aside>
         </>

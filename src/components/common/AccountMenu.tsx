@@ -35,6 +35,7 @@ interface SessionResponse {
 
 interface AccountMenuProps {
   className?: string;
+  touchMode?: boolean;
 }
 
 const sessionFetcher = async (url: string) => {
@@ -45,7 +46,7 @@ const sessionFetcher = async (url: string) => {
   return (await res.json()) as SessionResponse;
 };
 
-export function AccountMenu({ className }: AccountMenuProps) {
+export function AccountMenu({ className, touchMode = false }: AccountMenuProps) {
   const router = useRouter();
   const [avatarFailed, setAvatarFailed] = React.useState(false);
   const { theme, setTheme } = useTheme();
@@ -79,13 +80,19 @@ export function AccountMenu({ className }: AccountMenuProps) {
         <button
           type="button"
           className={cn(
-            "inline-flex h-12 w-full items-center rounded-lg px-3 text-left transition-colors hover:bg-muted/70",
+            "inline-flex w-full items-center rounded-lg text-left transition-colors hover:bg-muted/70",
+            touchMode ? "h-12 px-4" : "h-12 px-3",
             className
           )}
           aria-label="Open account menu"
         >
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full border bg-background">
+            <div
+              className={cn(
+                "flex items-center justify-center rounded-full border bg-background",
+                touchMode ? "h-9 w-9" : "h-8 w-8"
+              )}
+            >
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -95,40 +102,55 @@ export function AccountMenu({ className }: AccountMenuProps) {
                   onError={() => setAvatarFailed(true)}
                 />
               ) : (
-                <User className="h-4 w-4" />
+                <User className={cn(touchMode ? "h-5 w-5" : "h-4 w-4")} />
               )}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium leading-none">{name}</p>
-              <p className="truncate pt-px text-xs text-muted-foreground">{email}</p>
+              <p className={cn("truncate font-medium leading-none", touchMode ? "text-base" : "text-sm")}>
+                {name}
+              </p>
+              <p className={cn("truncate pt-px text-muted-foreground", touchMode ? "text-sm" : "text-xs")}>
+                {email}
+              </p>
             </div>
           </div>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="top" sideOffset={8} className="w-64 p-0">
+      <DropdownMenuContent
+        align={touchMode ? "start" : "end"}
+        side="top"
+        sideOffset={8}
+        className={cn(
+          "p-0",
+          touchMode
+            ? "w-[var(--radix-dropdown-menu-trigger-width)] max-w-[calc(100vw-2rem)]"
+            : "w-64"
+        )}
+      >
         <div className="p-1.5">
-          <DropdownMenuItem disabled className="h-8 rounded-md px-2.5 text-sm">
-            <UserCircle className="h-4 w-4" />
+          <DropdownMenuItem disabled className={cn("rounded-md px-2.5", touchMode ? "h-10 text-base" : "h-8 text-sm")}>
+            <UserCircle className={cn(touchMode ? "h-5 w-5" : "h-4 w-4")} />
             Account
           </DropdownMenuItem>
-          <DropdownMenuItem disabled className="h-8 rounded-md px-2.5 text-sm">
-            <CreditCard className="h-4 w-4" />
+          <DropdownMenuItem disabled className={cn("rounded-md px-2.5", touchMode ? "h-10 text-base" : "h-8 text-sm")}>
+            <CreditCard className={cn(touchMode ? "h-5 w-5" : "h-4 w-4")} />
             Billing
           </DropdownMenuItem>
-          <DropdownMenuItem disabled className="h-8 rounded-md px-2.5 text-sm">
-            <Bell className="h-4 w-4" />
+          <DropdownMenuItem disabled className={cn("rounded-md px-2.5", touchMode ? "h-10 text-base" : "h-8 text-sm")}>
+            <Bell className={cn(touchMode ? "h-5 w-5" : "h-4 w-4")} />
             Notifications
           </DropdownMenuItem>
-          <div className="flex h-8 items-center justify-between rounded-md px-2.5 text-sm">
+          <div className={cn("flex items-center justify-between rounded-md px-2.5", touchMode ? "h-10 text-base" : "h-8 text-sm")}>
             <div className="inline-flex items-center gap-2 text-foreground">
-              <Sun className="h-4 w-4 text-muted-foreground" />
+              <Sun className={cn("text-muted-foreground", touchMode ? "h-5 w-5" : "h-4 w-4")} />
               <span>Theme</span>
             </div>
             <div className="inline-flex rounded-md border p-0.5">
               <button
                 type="button"
                 className={cn(
-                  "inline-flex h-6 w-6 items-center justify-center rounded-sm",
+                  "inline-flex items-center justify-center rounded-sm",
+                  touchMode ? "h-7 w-7" : "h-6 w-6",
                   theme === "light"
                     ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -141,7 +163,8 @@ export function AccountMenu({ className }: AccountMenuProps) {
               <button
                 type="button"
                 className={cn(
-                  "inline-flex h-6 w-6 items-center justify-center rounded-sm",
+                  "inline-flex items-center justify-center rounded-sm",
+                  touchMode ? "h-7 w-7" : "h-6 w-6",
                   theme === "dark"
                     ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -154,7 +177,8 @@ export function AccountMenu({ className }: AccountMenuProps) {
               <button
                 type="button"
                 className={cn(
-                  "inline-flex h-6 w-6 items-center justify-center rounded-sm",
+                  "inline-flex items-center justify-center rounded-sm",
+                  touchMode ? "h-7 w-7" : "h-6 w-6",
                   theme === "system"
                     ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -169,8 +193,11 @@ export function AccountMenu({ className }: AccountMenuProps) {
         </div>
         <DropdownMenuSeparator className="my-0" />
         <div className="p-1.5">
-          <DropdownMenuItem className="h-8 rounded-md px-2.5 text-sm" onSelect={() => void handleLogout()}>
-            <LogOut className="h-4 w-4" />
+          <DropdownMenuItem
+            className={cn("rounded-md px-2.5", touchMode ? "h-10 text-base" : "h-8 text-sm")}
+            onSelect={() => void handleLogout()}
+          >
+            <LogOut className={cn(touchMode ? "h-5 w-5" : "h-4 w-4")} />
             Log out
           </DropdownMenuItem>
         </div>
