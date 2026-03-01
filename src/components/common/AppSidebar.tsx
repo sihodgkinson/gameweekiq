@@ -74,7 +74,7 @@ export function AppSidebar({
               ) : null}
             </div>
 
-            <nav className={cn("mt-1 flex flex-col gap-0", sidebarCollapsed ? "px-2" : "px-3")}>
+            <nav className={cn("mt-2 flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")}>
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const itemClasses = cn(
@@ -119,7 +119,7 @@ export function AppSidebar({
           )}
         />
 
-        <div className={cn("space-y-1 pb-3", sidebarCollapsed ? "px-2" : "px-3")} data-sidebar-interactive="true">
+        <div className={cn("space-y-0.5 pb-3", sidebarCollapsed ? "px-2" : "px-3")} data-sidebar-interactive="true">
           <button
             type="button"
             disabled
