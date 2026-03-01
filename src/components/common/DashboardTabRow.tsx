@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -20,6 +21,7 @@ interface DashboardTabRowProps {
   onValueChange: (value: string) => void;
   options: DashboardTabOption[];
   rightSlot?: React.ReactNode;
+  touchMode?: boolean;
 }
 
 export function DashboardTabRow({
@@ -27,13 +29,22 @@ export function DashboardTabRow({
   onValueChange,
   options,
   rightSlot,
+  touchMode = false,
 }: DashboardTabRowProps) {
   return (
     <>
       <div className="flex w-full items-center gap-2 sm:hidden">
         <div className="min-w-0 flex-1">
           <Select value={value} onValueChange={onValueChange}>
-            <SelectTrigger className="h-8 w-full text-sm">
+            <SelectTrigger
+              size={touchMode ? "default" : "sm"}
+              className={cn(
+                "w-full",
+                touchMode
+                  ? "h-10 px-4 text-base data-[size=default]:h-10 data-[size=sm]:h-10"
+                  : "h-8 text-sm"
+              )}
+            >
               <SelectValue placeholder="Select table" />
             </SelectTrigger>
             <SelectContent>
@@ -50,9 +61,14 @@ export function DashboardTabRow({
 
       <div className="hidden w-full items-center justify-between gap-3 sm:flex">
         <Tabs value={value} onValueChange={onValueChange}>
-          <TabsList className="h-8 p-[2px]">
+          <TabsList className={cn("h-8 p-[2px]", touchMode && "h-10 p-[3px]")}>
             {options.map((option) => (
-              <TabsTrigger key={option.value} value={option.value} type="button" className="px-3 sm:px-4">
+              <TabsTrigger
+                key={option.value}
+                value={option.value}
+                type="button"
+                className={cn("px-3 sm:px-4", touchMode && "px-4 text-base")}
+              >
                 {option.label}
               </TabsTrigger>
             ))}

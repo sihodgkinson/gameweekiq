@@ -642,11 +642,12 @@ export default function DashboardClient({
         selectedLeagueId={selectedLeagueId}
         currentGw={currentGw}
         maxGw={maxGw}
-        size="sm"
-        className="h-8 text-sm"
+        size={useDrawerNav ? "default" : "sm"}
+        className="sm:h-8 sm:text-sm"
+        touchMode={useDrawerNav}
       />
     ),
-    [currentGw, maxGw, selectedLeagueId]
+    [currentGw, maxGw, selectedLeagueId, useDrawerNav]
   );
 
   return (
@@ -705,7 +706,8 @@ export default function DashboardClient({
             leagues={leagues}
             selectedLeagueId={selectedLeagueId}
             currentGw={currentGw}
-            className="h-8 w-[170px] sm:w-[220px] text-sm"
+            className="w-[170px] sm:h-8 sm:w-[220px] sm:text-sm"
+            touchMode={useDrawerNav}
           />
         </>
       }
@@ -733,6 +735,7 @@ export default function DashboardClient({
         onValueChange={(value) => setTab(value as "league" | "activity" | "gw1")}
         options={tabOptions}
         rightSlot={gameweekSelectorControl}
+        touchMode={useDrawerNav}
       />
 
       {showSwipeHint ? (
