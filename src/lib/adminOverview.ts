@@ -29,6 +29,12 @@ export interface AdminLeagueSummary {
   leagueName: string | null;
   linkedUsers: number;
   linkedRows: number;
+  createdAt: string | null;
+  linkedUserDetails: Array<{
+    id: string;
+    name: string | null;
+    email: string | null;
+  }>;
 }
 
 export interface AdminOverviewData {
@@ -235,6 +241,7 @@ interface UserLeagueLinkRow {
   user_id: string | null;
   league_id: number | null;
   league_name: string | null;
+  created_at: string | null;
 }
 
 async function listUserLeagueLinks(): Promise<UserLeagueLinkRow[]> {
@@ -248,7 +255,7 @@ async function listUserLeagueLinks(): Promise<UserLeagueLinkRow[]> {
 
   while (true) {
     const res = await fetch(
-      `${config.url}/rest/v1/user_leagues?select=user_id,league_id,league_name&order=created_at.desc&limit=${pageSize}&offset=${offset}`,
+      `${config.url}/rest/v1/user_leagues?select=user_id,league_id,league_name,created_at&order=created_at.desc&limit=${pageSize}&offset=${offset}`,
       {
         method: "GET",
         headers: {
@@ -305,7 +312,31 @@ export async function getAdminOverviewData(): Promise<AdminOverviewData> {
 
   const leagueCountByUserId = new Map<string, number>();
   const leagueDetailsByUserId = new Map<string, Map<number, string | null>>();
-  const leagueAggregation = new Map<number, { linkedUsers: Set<string>; linkedRows: number; leagueName: string | null }>();
+  const leagueAggregation = new Map<
+    number,
+    {
+      linkedUsers: Set<string>;
+      linkedRows: number;
+      leagueName: string | null;
+      earliestCreatedAt: string | null;
+      latestCreatedAt: string | null;
+    }
+  >();
+  const userSummaryById = new Map<
+    string,
+    {
+      name: string | null;
+      email: string | null;
+    }
+  >(
+    authUserList.users.map((user) => [
+      user.id,
+      {
+        name: extractUserName(user.user_metadata),
+        email: user.email ?? null,
+      },
+    ])
+  );
 
   for (const link of userLeagueLinks) {
     const userId = typeof link.user_id === "string" && link.user_id.length > 0 ? link.user_id : null;
@@ -325,11 +356,34 @@ export async function getAdminOverviewData(): Promise<AdminOverviewData> {
       linkedUsers: new Set<string>(),
       linkedRows: 0,
       leagueName: null as string | null,
+      earliestCreatedAt: null as string | null,
+      latestCreatedAt: null as string | null,
     };
 
     current.linkedRows += 1;
     if (userId) current.linkedUsers.add(userId);
     if (!current.leagueName && link.league_name) current.leagueName = link.league_name;
+    if (link.created_at) {
+      const linkTs = Date.parse(link.created_at);
+
+      if (!current.earliestCreatedAt) {
+        current.earliestCreatedAt = link.created_at;
+      } else {
+        const earliestTs = Date.parse(current.earliestCreatedAt);
+        if (Number.isFinite(linkTs) && (!Number.isFinite(earliestTs) || linkTs < earliestTs)) {
+          current.earliestCreatedAt = link.created_at;
+        }
+      }
+
+      if (!current.latestCreatedAt) {
+        current.latestCreatedAt = link.created_at;
+      } else {
+        const latestTs = Date.parse(current.latestCreatedAt);
+        if (Number.isFinite(linkTs) && (!Number.isFinite(latestTs) || linkTs > latestTs)) {
+          current.latestCreatedAt = link.created_at;
+        }
+      }
+    }
     leagueAggregation.set(leagueId, current);
   }
 
@@ -360,8 +414,29 @@ export async function getAdminOverviewData(): Promise<AdminOverviewData> {
       leagueName: aggregate.leagueName,
       linkedUsers: aggregate.linkedUsers.size,
       linkedRows: aggregate.linkedRows,
+      createdAt: aggregate.earliestCreatedAt,
+      linkedUserDetails: [...aggregate.linkedUsers]
+        .map((userId) => {
+          const user = userSummaryById.get(userId);
+          return {
+            id: userId,
+            name: user?.name ?? null,
+            email: user?.email ?? null,
+          };
+        })
+        .sort((a, b) => {
+          const aLabel = (a.name || a.email || a.id).toLowerCase();
+          const bLabel = (b.name || b.email || b.id).toLowerCase();
+          return aLabel.localeCompare(bLabel);
+        }),
     }))
-    .sort((a, b) => b.linkedUsers - a.linkedUsers || b.linkedRows - a.linkedRows || a.leagueId - b.leagueId);
+    .sort((a, b) => {
+      const aParsed = Date.parse(a.createdAt ?? "");
+      const bParsed = Date.parse(b.createdAt ?? "");
+      const aTs = Number.isFinite(aParsed) ? aParsed : 0;
+      const bTs = Number.isFinite(bParsed) ? bParsed : 0;
+      return bTs - aTs || b.leagueId - a.leagueId;
+    });
 
   return {
     users,

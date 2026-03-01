@@ -46,6 +46,12 @@ interface AdminOverviewResponse {
     leagueName: string | null;
     linkedUsers: number;
     linkedRows: number;
+    createdAt: string | null;
+    linkedUserDetails: Array<{
+      id: string;
+      name: string | null;
+      email: string | null;
+    }>;
   }[];
   rowsBySource: {
     tableName: string;
@@ -260,22 +266,48 @@ export function AdminOverviewClient() {
                 <>
                   <TableHeader className="bg-background [&_th]:font-semibold">
                     <TableRow className="text-foreground hover:bg-transparent">
-                      <TableHead>League</TableHead>
-                      <TableHead className="text-right">Users</TableHead>
-                      <TableHead className="text-right">Links</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead className="text-right">League Id</TableHead>
+                      <TableHead className="text-center">Users</TableHead>
+                      <TableHead className="text-right">Created</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {data?.leaguesTable?.map((row) => (
                       <TableRow key={row.leagueId}>
                         <TableCell>
-                          <div className="font-medium">{row.leagueName ?? `League ${row.leagueId}`}</div>
-                          <div className="text-xs text-muted-foreground">
-                            ID: {row.leagueId}
-                          </div>
+                          {row.leagueName ?? `League ${row.leagueId}`}
                         </TableCell>
-                        <TableCell className="text-right font-mono">{formatCount(row.linkedUsers)}</TableCell>
-                        <TableCell className="text-right font-mono">{formatCount(row.linkedRows)}</TableCell>
+                        <TableCell className="text-right font-mono">{row.leagueId}</TableCell>
+                        <TableCell className="text-center font-mono">
+                          {row.linkedUsers > 0 ? (
+                            <ResponsiveInfoCard
+                              trigger={
+                                <button className="cursor-pointer underline decoration-dotted">
+                                  {formatCount(row.linkedUsers)}
+                                </button>
+                              }
+                              content={
+                                <ul className="space-y-1 text-sm">
+                                  {row.linkedUserDetails.map((user) => (
+                                    <li
+                                      key={`${row.leagueId}-${user.id}`}
+                                      className="text-muted-foreground"
+                                    >
+                                      {user.email ?? user.id}
+                                    </li>
+                                  ))}
+                                </ul>
+                              }
+                              className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
+                            />
+                          ) : (
+                            <span>{formatCount(row.linkedUsers)}</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-mono">
+                          {formatDate(row.createdAt)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
