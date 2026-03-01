@@ -75,7 +75,7 @@ export function ChipsTab({
   return (
     <DashboardTableCard className="mobile-landscape-table" fillHeight>
       <Table className="w-full table-auto text-sm">
-        <TableHeader className="sticky top-0 z-10 bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
+        <TableHeader className="bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
           <TableRow className="text-foreground hover:bg-transparent">
             <TableHead className="w-1/3 text-left">Team</TableHead>
             <TableHead className="hidden w-1/3 text-left sm:table-cell">

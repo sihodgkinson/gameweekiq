@@ -20,7 +20,7 @@ export function DashboardTableCard({
   loading = false,
   headerRight,
   loadingFallback,
-  fillHeight = false,
+  fillHeight = true,
   className,
   children,
 }: DashboardTableCardProps) {
@@ -42,7 +42,7 @@ export function DashboardTableCard({
         </div>
       ) : null}
 
-      <div className={cn("min-h-0", fillHeight && "flex-1 overflow-auto")}>
+      <div className={cn("min-h-0", fillHeight && "flex-1")}>
         {loading ? (
           loadingFallback ?? (
             <div className="space-y-2">
