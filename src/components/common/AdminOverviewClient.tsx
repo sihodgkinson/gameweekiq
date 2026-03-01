@@ -152,7 +152,7 @@ export function AdminOverviewClient() {
       mobileSidebarOpen={mobileSidebarOpen}
       onMobileSidebarOpenChange={setMobileSidebarOpen}
       headerRight={
-        <div className="hidden sm:inline-flex h-8 items-center gap-2 rounded-md border border-blue-500/40 bg-blue-500/10 px-3 text-xs font-medium text-blue-700 dark:text-blue-300">
+        <div className="inline-flex h-8 items-center gap-2 rounded-md border border-blue-500/40 bg-blue-500/10 px-3 text-xs font-medium text-blue-700 dark:text-blue-300">
           <Database className="h-3.5 w-3.5" />
           <span>Read-only</span>
         </div>
