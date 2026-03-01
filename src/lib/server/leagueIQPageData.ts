@@ -1,4 +1,5 @@
 import { enrichStandings } from "@/features/league/utils/enrichStandings";
+import { isAdminUser } from "@/lib/adminAccess";
 import { getClassicLeague, getCurrentGameweek, getMaxGameweek } from "@/lib/fpl";
 import { getServerSessionUser } from "@/lib/supabaseAuth";
 import { listUserLeagues } from "@/lib/userLeagues";
@@ -38,6 +39,7 @@ export type LeagueIQPageState =
       maxGw: number;
       gw: number;
       selectedLeagueId: number;
+      isAdmin: boolean;
       leagues: LeagueSummary[];
     };
 
@@ -121,6 +123,7 @@ export async function loadLeagueIQPageData(
     maxGw,
     gw,
     selectedLeagueId,
+    isAdmin: isAdminUser(sessionUser),
     leagues,
   };
 }

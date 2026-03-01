@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { enrichStandings } from "@/features/league/utils/enrichStandings";
 import DashboardClient from "@/app/(dashboard)/[leagueID]/DashboardClient";
 import { OnboardingGate } from "@/components/common/OnboardingGate";
+import { isAdminUser } from "@/lib/adminAccess";
 import { EnrichedStanding } from "@/types/fpl";
 import { listUserLeagues } from "@/lib/userLeagues";
 import { getServerSessionUser } from "@/lib/supabaseAuth";
@@ -128,6 +129,7 @@ export default async function DashboardPage({
       maxGw={maxGw}
       gw={gw}
       activeView="tables"
+      isAdmin={isAdminUser(sessionUser)}
     />
   );
 }

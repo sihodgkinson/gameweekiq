@@ -44,6 +44,7 @@ export default async function LeagueIQViewPage({
       maxGw={pageData.maxGw}
       gw={pageData.gw}
       activeView={view}
+      isAdmin={pageData.isAdmin}
     />
   );
 }

@@ -16,6 +16,7 @@ import {
   Menu,
   Settings,
   RefreshCw,
+  Shield,
   Table2,
   X,
 } from "lucide-react";
@@ -84,6 +85,7 @@ interface DashboardClientProps {
   maxGw: number;
   gw: number;
   activeView: LeagueIQView;
+  isAdmin: boolean;
 }
 
 const LIVE_POLL_LOCK_KEY = "fpl-live-refresh-lock";
@@ -167,6 +169,7 @@ export default function DashboardClient({
   maxGw,
   gw,
   activeView,
+  isAdmin,
 }: DashboardClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -284,6 +287,17 @@ export default function DashboardClient({
       },
     ],
     [activeView, sidebarQueryString]
+  );
+  const adminSidebarItems = React.useMemo(
+    () => [
+      {
+        key: "overview",
+        label: "Overview",
+        href: "/dashboard/admin/overview",
+        icon: Shield,
+      },
+    ],
+    []
   );
 
   const prefetchKey = React.useCallback(
@@ -724,6 +738,37 @@ export default function DashboardClient({
           })}
         </nav>
 
+        {isAdmin ? (
+          <>
+            <div className={cn("mt-4", sidebarCollapsed ? "px-2" : "px-3")}>
+              {!sidebarCollapsed ? (
+                <p className="px-2 pb-1 text-xs font-medium tracking-wide text-muted-foreground">
+                  Admin
+                </p>
+              ) : null}
+            </div>
+
+            <nav className={cn("mt-1 flex flex-col gap-1", sidebarCollapsed ? "px-2" : "px-3")}>
+              {adminSidebarItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    className={cn(
+                      "inline-flex h-8 items-center gap-2 rounded-md px-2 text-sm text-foreground transition-colors duration-150 hover:bg-muted/70 hover:text-foreground",
+                      sidebarCollapsed && "mx-auto w-8 justify-center px-0"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {!sidebarCollapsed ? <span>{item.label}</span> : null}
+                  </Link>
+                );
+              })}
+            </nav>
+          </>
+        ) : null}
+
         <div
           className={cn(
             "mt-1 flex flex-1 flex-col gap-3 overflow-y-auto",
@@ -818,6 +863,32 @@ export default function DashboardClient({
                 );
               })}
             </nav>
+
+            {isAdmin ? (
+              <>
+                <div>
+                  <p className="pb-1 text-xs font-medium text-muted-foreground">
+                    Admin
+                  </p>
+                </div>
+
+                <nav className="flex flex-col gap-1">
+                  {adminSidebarItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.key}
+                        href={item.href}
+                        className="inline-flex h-8 items-center rounded-md px-3 text-sm text-foreground transition-colors duration-150 hover:bg-muted/70 hover:text-foreground"
+                      >
+                        <Icon className="mr-2 h-4 w-4 shrink-0" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </>
+            ) : null}
 
             <div className="mt-auto space-y-4" data-sidebar-interactive="true">
               <button
