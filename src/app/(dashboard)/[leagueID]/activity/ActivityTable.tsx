@@ -3,8 +3,17 @@
 import useSWR from "swr";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp, Minus } from "lucide-react";
+import { DashboardTableCard } from "@/components/common/DashboardTableCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResponsiveInfoCard } from "@/components/ui/responsive-info-card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -57,33 +66,33 @@ function scoreClass(value: number): string {
 
 function ActivityRowSkeleton() {
   return (
-    <tr className="animate-pulse">
-      <td className="p-2 sm:p-4">
+    <TableRow className="animate-pulse hover:bg-transparent">
+      <TableCell className="p-2 sm:p-4">
         <Skeleton className="h-4 w-8" />
-      </td>
-      <td className="p-2 sm:p-4">
+      </TableCell>
+      <TableCell className="p-2 sm:p-4">
         <Skeleton className="mb-1 h-4 w-32" />
         <Skeleton className="h-3 w-20" />
-      </td>
-      <td className="hidden p-2 md:table-cell sm:p-4">
+      </TableCell>
+      <TableCell className="hidden p-2 md:table-cell sm:p-4">
         <Skeleton className="h-4 w-28" />
-      </td>
-      <td className="p-2 text-right sm:p-4">
+      </TableCell>
+      <TableCell className="p-2 text-right sm:p-4">
         <Skeleton className="ml-auto h-4 w-12" />
-      </td>
-      <td className="hidden p-2 text-right sm:table-cell sm:p-4">
+      </TableCell>
+      <TableCell className="hidden p-2 text-right sm:table-cell sm:p-4">
         <Skeleton className="ml-auto h-4 w-10" />
-      </td>
-      <td className="p-2 text-right sm:p-4">
+      </TableCell>
+      <TableCell className="hidden p-2 text-right sm:table-cell sm:p-4">
+        <Skeleton className="ml-auto h-4 w-10" />
+      </TableCell>
+      <TableCell className="p-2 text-right sm:p-4">
         <Skeleton className="ml-auto h-4 w-12" />
-      </td>
-      <td className="hidden p-2 text-right sm:table-cell sm:p-4">
-        <Skeleton className="ml-auto h-4 w-10" />
-      </td>
-      <td className="p-2 text-right sm:p-4">
+      </TableCell>
+      <TableCell className="p-2 text-right sm:p-4">
         <Skeleton className="ml-auto h-4 w-14" />
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -106,14 +115,16 @@ export function ActivityTab({
   if (error) return <div>Error loading activity</div>;
 
   return (
-    <div className="mobile-landscape-table w-full overflow-x-auto rounded-md border border-border sm:h-full sm:overflow-auto">
-      <table className="w-full table-auto text-sm">
-        <thead className="sticky top-0 z-10 bg-muted [&_th]:h-10 [&_th]:!py-0 [&_th]:font-normal">
-          <tr className="border-b bg-card font-normal text-foreground">
-            <th className="p-2 text-left sm:p-4 w-3/100">Pos</th>
-            <th className="p-2 text-left sm:p-4 w-25/100">Team</th>
-            <th className="hidden p-2 text-left md:table-cell sm:p-4 w-22/100">Manager</th>
-            <th className="hidden p-2 text-right sm:table-cell sm:p-4 w-10/100">
+    <DashboardTableCard className="mobile-landscape-table" fillHeight>
+      <Table className="w-full table-auto text-sm">
+        <TableHeader className="sticky top-0 z-10 bg-background [&_th]:h-10 [&_th]:!py-0 [&_th]:font-semibold">
+          <TableRow className="text-foreground hover:bg-transparent">
+            <TableHead className="w-3/100 p-2 text-left sm:p-4">Pos</TableHead>
+            <TableHead className="w-25/100 p-2 text-left sm:p-4">Team</TableHead>
+            <TableHead className="hidden w-22/100 p-2 text-left md:table-cell sm:p-4">
+              Manager
+            </TableHead>
+            <TableHead className="hidden w-10/100 p-2 text-right sm:table-cell sm:p-4">
               <div className="inline-flex items-center justify-end">
                 <ResponsiveInfoCard
                   trigger={
@@ -126,14 +137,13 @@ export function ActivityTab({
                     </button>
                   }
                   content={
-                    <div className="space-y-2 text-sm text-muted-foreground leading-relaxed">
+                    <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
                       <p className="font-medium text-foreground">
                         How Transfer Impact is calculated
                       </p>
                       <p>
                         <span className="text-foreground">Transfer Impact</span> = points from
-                        players bought
-                        {" \u2212 "}points from players sold{" \u2212 "}transfer hit cost.
+                        players bought {" − "}points from players sold{" − "}transfer hit cost.
                       </p>
                       <p>For Free Hit, transfer hit cost is always treated as 0.</p>
                     </div>
@@ -141,8 +151,8 @@ export function ActivityTab({
                   className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
                 />
               </div>
-            </th>
-            <th className="hidden p-2 text-right sm:table-cell sm:p-4 w-10/100">
+            </TableHead>
+            <TableHead className="hidden w-10/100 p-2 text-right sm:table-cell sm:p-4">
               <div className="inline-flex items-center justify-end">
                 <ResponsiveInfoCard
                   trigger={
@@ -155,7 +165,7 @@ export function ActivityTab({
                     </button>
                   }
                   content={
-                    <div className="space-y-2 text-sm text-muted-foreground leading-relaxed">
+                    <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
                       <p className="font-medium text-foreground">How Chip Impact is calculated</p>
                       <p>
                         <span className="text-foreground">Chip Impact</span> = extra points
@@ -169,8 +179,8 @@ export function ActivityTab({
                   className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
                 />
               </div>
-            </th>
-            <th className="hidden p-2 text-right sm:table-cell sm:p-4 w-10/100">
+            </TableHead>
+            <TableHead className="hidden w-10/100 p-2 text-right sm:table-cell sm:p-4">
               <div className="inline-flex items-center justify-end">
                 <ResponsiveInfoCard
                   trigger={
@@ -183,13 +193,12 @@ export function ActivityTab({
                     </button>
                   }
                   content={
-                    <div className="space-y-2 text-sm text-muted-foreground leading-relaxed">
+                    <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
                       <p className="font-medium text-foreground">
                         How Captain Impact is calculated
                       </p>
                       <p>
-                        If captain changed from last GW:
-                        {" "}
+                        If captain changed from last GW:{" "}
                         <span className="text-foreground">
                           2 × (new captain points − previous captain points)
                         </span>
@@ -202,20 +211,17 @@ export function ActivityTab({
                   className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
                 />
               </div>
-            </th>
-            <th className="p-2 text-right sm:p-4 w-10/100">GW</th>
-            <th className="p-2 text-right sm:p-4 w-10/100">Total</th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+            <TableHead className="w-10/100 p-2 text-right sm:p-4">GW</TableHead>
+            <TableHead className="w-10/100 p-2 text-right sm:p-4">Total</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {!data
             ? [...Array(5)].map((_, i) => <ActivityRowSkeleton key={i} />)
             : data.map((row) => (
-                <tr
-                  key={row.entryId}
-                  className="border-b transition-colors last:border-b-0 hover:bg-muted/30"
-                >
-                  <td className="p-2 font-mono sm:p-4">
+                <TableRow key={row.entryId} className="hover:bg-muted/30">
+                  <TableCell className="p-2 font-mono sm:p-4">
                     <div className="flex items-center gap-1">
                       <span>{row.pos}</span>
                       {row.movement > 0 ? (
@@ -226,18 +232,18 @@ export function ActivityTab({
                         <Minus className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
-                  </td>
+                  </TableCell>
 
-                  <td className="p-2 sm:p-4">
+                  <TableCell className="p-2 sm:p-4">
                     <div className="font-medium">{row.team}</div>
                     <div className="block text-xs text-muted-foreground md:hidden">
                       {row.manager}
                     </div>
-                  </td>
+                  </TableCell>
 
-                  <td className="hidden p-2 md:table-cell sm:p-4">{row.manager}</td>
+                  <TableCell className="hidden p-2 md:table-cell sm:p-4">{row.manager}</TableCell>
 
-                  <td
+                  <TableCell
                     className={`hidden p-2 text-right font-mono sm:table-cell sm:p-4 ${scoreClass(
                       row.transferImpactNet
                     )}`}
@@ -286,9 +292,13 @@ export function ActivityTab({
                     ) : (
                       <span>{formatSignedNumber(row.transferImpactNet)}</span>
                     )}
-                  </td>
+                  </TableCell>
 
-                  <td className={`hidden p-2 text-right font-mono sm:table-cell sm:p-4 ${scoreClass(row.chipImpact)}`}>
+                  <TableCell
+                    className={`hidden p-2 text-right font-mono sm:table-cell sm:p-4 ${scoreClass(
+                      row.chipImpact
+                    )}`}
+                  >
                     {row.chip ? (
                       <ResponsiveInfoCard
                         trigger={
@@ -318,9 +328,13 @@ export function ActivityTab({
                     ) : (
                       <span>{formatSignedNumber(row.chipImpact)}</span>
                     )}
-                  </td>
+                  </TableCell>
 
-                  <td className={`hidden p-2 text-right font-mono sm:table-cell sm:p-4 ${scoreClass(row.captainImpact)}`}>
+                  <TableCell
+                    className={`hidden p-2 text-right font-mono sm:table-cell sm:p-4 ${scoreClass(
+                      row.captainImpact
+                    )}`}
+                  >
                     {row.previousCaptainName && row.currentCaptainName ? (
                       <ResponsiveInfoCard
                         trigger={
@@ -340,9 +354,9 @@ export function ActivityTab({
                     ) : (
                       <span>{formatSignedNumber(row.captainImpact)}</span>
                     )}
-                  </td>
+                  </TableCell>
 
-                  <td className={`p-2 text-right font-mono sm:p-4 ${scoreClass(row.gwDecisionScore)}`}>
+                  <TableCell className={`p-2 text-right font-mono sm:p-4 ${scoreClass(row.gwDecisionScore)}`}>
                     <ResponsiveInfoCard
                       trigger={
                         <button className="cursor-pointer underline decoration-dotted">
@@ -373,15 +387,19 @@ export function ActivityTab({
                       }
                       className="max-w-[90vw] rounded-sm border bg-popover p-3 text-popover-foreground shadow-sm"
                     />
-                  </td>
+                  </TableCell>
 
-                  <td className={`p-2 text-right font-mono sm:p-4 ${scoreClass(row.runningInfluenceTotal)}`}>
+                  <TableCell
+                    className={`p-2 text-right font-mono sm:p-4 ${scoreClass(
+                      row.runningInfluenceTotal
+                    )}`}
+                  >
                     {formatSignedNumber(row.runningInfluenceTotal)}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </DashboardTableCard>
   );
 }

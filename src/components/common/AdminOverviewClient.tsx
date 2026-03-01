@@ -5,14 +5,11 @@ import useSWR from "swr";
 import {
   Coins,
   Database,
-  Loader2,
   RefreshCw,
   Table2,
 } from "lucide-react";
 import { AppShell, useAppShellNavigation } from "@/components/common/AppShell";
 import type { AppSidebarSection } from "@/components/common/AppSidebar";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -21,6 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DashboardStatCard, DashboardStatGrid } from "@/components/common/DashboardStatCard";
+import { DashboardTableCard } from "@/components/common/DashboardTableCard";
 
 interface AdminOverviewResponse {
   users: number;
@@ -46,29 +45,6 @@ const fetcher = async (url: string) => {
 function formatCount(value: number | null | undefined): string {
   if (!Number.isFinite(value ?? NaN)) return "--";
   return new Intl.NumberFormat("en-GB").format(value as number);
-}
-
-function OverviewStatCard({
-  label,
-  value,
-  loading,
-}: {
-  label: string;
-  value: number | null | undefined;
-  loading: boolean;
-}) {
-  return (
-    <Card className="gap-3 p-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{label}</p>
-      </div>
-      {loading ? (
-        <Skeleton className="h-10 w-28" />
-      ) : (
-        <p className="text-4xl font-mono font-semibold leading-none">{formatCount(value)}</p>
-      )}
-    </Card>
-  );
 }
 
 export function AdminOverviewClient() {
@@ -146,46 +122,34 @@ export function AdminOverviewClient() {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <OverviewStatCard
+      <DashboardStatGrid>
+        <DashboardStatCard
           label="Users"
-          value={data?.users}
+          value={formatCount(data?.users)}
           loading={isLoading}
         />
-        <OverviewStatCard
+        <DashboardStatCard
           label="Leagues"
-          value={data?.uniqueTrackedLeagues}
+          value={formatCount(data?.uniqueTrackedLeagues)}
           loading={isLoading}
         />
-        <OverviewStatCard
+        <DashboardStatCard
           label="Cache Rows"
-          value={data?.cacheRows}
+          value={formatCount(data?.cacheRows)}
           loading={isLoading}
         />
-        <OverviewStatCard
+        <DashboardStatCard
           label="Total Rows"
-          value={data?.totalRows}
+          value={formatCount(data?.totalRows)}
           loading={isLoading}
         />
-      </div>
+      </DashboardStatGrid>
 
-      <Card className="gap-3 p-4 sm:min-h-0 sm:flex-1">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium">Row Counts By Source</h2>
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : null}
-        </div>
-
-        <div className="min-h-0 sm:flex-1 sm:overflow-auto">
-          {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
-            </div>
-          ) : (
+      <DashboardTableCard loading={isLoading}>
+        {!isLoading ? (
             <Table>
-              <TableHeader>
-                <TableRow>
+              <TableHeader className="bg-background [&_th]:font-semibold">
+                <TableRow className="text-foreground hover:bg-transparent">
                   <TableHead className="w-[45%]">Table</TableHead>
                   <TableHead>Schema</TableHead>
                   <TableHead className="text-right">Rows</TableHead>
@@ -201,9 +165,8 @@ export function AdminOverviewClient() {
                 ))}
               </TableBody>
             </Table>
-          )}
-        </div>
-      </Card>
+          ) : null}
+      </DashboardTableCard>
     </AppShell>
   );
 }

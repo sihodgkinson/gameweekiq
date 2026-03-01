@@ -24,14 +24,7 @@ import {
   useAppShellNavigation,
 } from "@/components/common/AppShell";
 import type { AppSidebarSection } from "@/components/common/AppSidebar";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { DashboardTabRow, type DashboardTabOption } from "@/components/common/DashboardTabRow";
 import {
   LEAGUEIQ_VIEW_BY_KEY,
   LeagueIQView,
@@ -658,6 +651,26 @@ export default function DashboardClient({
   const handleMobileSwipeCancel = React.useCallback(() => {
     swipeRef.current = null;
   }, []);
+  const tabOptions = React.useMemo<DashboardTabOption[]>(
+    () => [
+      { value: "league", label: "League" },
+      { value: "activity", label: "ManagerIQ" },
+      { value: "gw1", label: "GW 1 Team" },
+    ],
+    []
+  );
+  const gameweekSelectorControl = React.useMemo(
+    () => (
+      <GameweekSelector
+        selectedLeagueId={selectedLeagueId}
+        currentGw={currentGw}
+        maxGw={maxGw}
+        size="sm"
+        className="h-8 text-sm"
+      />
+    ),
+    [currentGw, maxGw, selectedLeagueId]
+  );
 
   return (
     <AppShell
@@ -726,50 +739,12 @@ export default function DashboardClient({
         hasError={Boolean(error)}
       />
 
-      <div className="flex w-full items-center gap-2 sm:hidden">
-        <div className="min-w-0 flex-1">
-          <Select value={tab} onValueChange={(value) => setTab(value as "league" | "activity" | "gw1")}>
-            <SelectTrigger className="h-8 w-full text-sm">
-              <SelectValue placeholder="Select table" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="league">League</SelectItem>
-              <SelectItem value="activity">ManagerIQ</SelectItem>
-              <SelectItem value="gw1">GW 1 Team</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <GameweekSelector
-          selectedLeagueId={selectedLeagueId}
-          currentGw={currentGw}
-          maxGw={maxGw}
-          size="sm"
-          className="h-8 text-sm"
-        />
-      </div>
-
-      <div className="hidden w-full items-center justify-between gap-3 sm:flex">
-        <Tabs value={tab} onValueChange={(value) => setTab(value as "league" | "activity" | "gw1")}>
-          <TabsList className="h-8 p-[2px]">
-            <TabsTrigger value="league" type="button" className="px-3 sm:px-4">
-              League
-            </TabsTrigger>
-            <TabsTrigger value="activity" type="button" className="px-3 sm:px-4">
-              ManagerIQ
-            </TabsTrigger>
-            <TabsTrigger value="gw1" type="button" className="px-3 sm:px-4">
-              GW 1 Team
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <GameweekSelector
-          selectedLeagueId={selectedLeagueId}
-          currentGw={currentGw}
-          maxGw={maxGw}
-          size="sm"
-          className="h-8 text-sm"
-        />
-      </div>
+      <DashboardTabRow
+        value={tab}
+        onValueChange={(value) => setTab(value as "league" | "activity" | "gw1")}
+        options={tabOptions}
+        rightSlot={gameweekSelectorControl}
+      />
 
       {showSwipeHint ? (
         <div className="sm:hidden flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
